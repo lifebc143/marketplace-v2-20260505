@@ -17,6 +17,55 @@ const adminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
 });
 
 export const adminRouter = router({
+  // Get dashboard statistics
+  stats: adminProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) {
+      return {
+        totalUsers: 0,
+        activeProducts: 0,
+        pendingReviewProducts: 0,
+        totalCategories: 0,
+      };
+    }
+
+    try {
+      // Get total users
+      const allUsers = await db.select().from(users);
+      const totalUsers = allUsers.length;
+
+      // Get active products (status = 'active')
+      const activeProducts = await db
+        .select()
+        .from(products)
+        .where(eq(products.status, "active"));
+
+      // Get pending review products
+      const pendingProducts = await db
+        .select()
+        .from(products)
+        .where(eq(products.status, "pending_review"));
+
+      // Get total categories
+      const allCategories = await db.select().from(categories);
+
+      return {
+        totalUsers,
+        activeProducts: activeProducts.length,
+        pendingReviewProducts: pendingProducts.length,
+        totalCategories: allCategories.length,
+      };
+    } catch (error) {
+      console.error("[Admin] Error fetching stats:", error);
+      return {
+        totalUsers: 0,
+        activeProducts: 0,
+        pendingReviewProducts: 0,
+        totalCategories: 0,
+      };
+    }
+  }),
+
   // Get all users
   users: adminProcedure
     .input(
