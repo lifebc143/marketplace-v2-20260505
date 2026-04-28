@@ -1,7 +1,7 @@
-import { z } from "zod";
 import { protectedProcedure, router } from "../_core/trpc";
+import { z } from "zod";
 import { getDb } from "../db";
-import { users, products, userProfiles } from "../../drizzle/schema";
+import { users, products, userProfiles, categories } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
@@ -206,6 +206,141 @@ export const adminRouter = router({
         .update(products)
         .set({ status: "removed" })
         .where(eq(products.id, input.productId));
+
+      return { success: true };
+    }),
+
+  // Category management
+  categories: adminProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) return [];
+    return db.select().from(categories);
+  }),
+
+  createCategory: adminProcedure
+    .input(
+      z.object({
+        name: z.string().min(1).max(100),
+        slug: z.string().min(1).max(100),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Database not available",
+        });
+      }
+
+      try {
+        await db.insert(categories).values({
+          name: input.name,
+          slug: input.slug,
+        });
+
+        return { success: true };
+      } catch (error: any) {
+        if (error.code === "ER_DUP_ENTRY") {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "Category slug already exists",
+          });
+        }
+        throw error;
+      }
+    }),
+
+  updateCategory: adminProcedure
+    .input(
+      z.object({
+        id: z.number().int().positive(),
+        name: z.string().min(1).max(100),
+        slug: z.string().min(1).max(100),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Database not available",
+        });
+      }
+
+      const existing = await db
+        .select()
+        .from(categories)
+        .where(eq(categories.id, input.id))
+        .limit(1);
+
+      if (!existing[0]) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Category not found",
+        });
+      }
+
+      try {
+        await db
+          .update(categories)
+          .set({
+            name: input.name,
+            slug: input.slug,
+          })
+          .where(eq(categories.id, input.id));
+
+        return { success: true };
+      } catch (error: any) {
+        if (error.code === "ER_DUP_ENTRY") {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "Category slug already exists",
+          });
+        }
+        throw error;
+      }
+    }),
+
+  deleteCategory: adminProcedure
+    .input(z.object({ id: z.number().int().positive() }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Database not available",
+        });
+      }
+
+      const existing = await db
+        .select()
+        .from(categories)
+        .where(eq(categories.id, input.id))
+        .limit(1);
+
+      if (!existing[0]) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Category not found",
+        });
+      }
+
+      // Check if category has products
+      const productsInCategory = await db
+        .select()
+        .from(products)
+        .where(eq(products.categoryId, input.id))
+        .limit(1);
+
+      if (productsInCategory.length > 0) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "Cannot delete category with existing products",
+        });
+      }
+
+      await db.delete(categories).where(eq(categories.id, input.id));
 
       return { success: true };
     }),

@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Loader2, Users, ShoppingBag, AlertCircle, ArrowLeft } from "lucide-react";
+import { Loader2, Users, ShoppingBag, AlertCircle, ArrowLeft, Tag } from "lucide-react";
 import { Link } from "wouter";
 
 export default function AdminDashboard() {
@@ -156,7 +156,7 @@ export default function AdminDashboard() {
         {/* Quick Actions */}
         <Card className="mt-8 p-6">
           <h2 className="text-lg font-bold mb-4">快速操作</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
             <Link href="/admin/users">
               <Button variant="outline" className="w-full">
                 <Users className="w-4 h-4 mr-2" />
@@ -167,6 +167,12 @@ export default function AdminDashboard() {
               <Button variant="outline" className="w-full">
                 <ShoppingBag className="w-4 h-4 mr-2" />
                 商品審核
+              </Button>
+            </Link>
+            <Link href="/admin/categories">
+              <Button variant="outline" className="w-full">
+                <Tag className="w-4 h-4 mr-2" />
+                分類管理
               </Button>
             </Link>
             <Link href="/admin/reports">

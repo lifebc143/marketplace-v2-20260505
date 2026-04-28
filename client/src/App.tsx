@@ -13,6 +13,7 @@ import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminUsers from "./pages/AdminUsers";
 import AdminProducts from "./pages/AdminProducts";
+import AdminCategories from "./pages/AdminCategories";
 
 function Router() {
   // Route order matters: specific routes must come before dynamic ones
@@ -28,6 +29,7 @@ function Router() {
       <Route path={"/admin"} component={AdminDashboard} />
       <Route path={"/admin/users"} component={AdminUsers} />
       <Route path={"/admin/products"} component={AdminProducts} />
+      <Route path={"/admin/categories"} component={AdminCategories} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
