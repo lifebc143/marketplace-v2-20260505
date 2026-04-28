@@ -28,28 +28,26 @@ export default function Navbar() {
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex items-center justify-between h-16">
         {/* Logo */}
-        <Link href="/">
-          <a className="flex items-center gap-2 font-bold text-lg hover:opacity-80 transition">
-            <ShoppingBag className="w-6 h-6 text-accent" />
-            <span>Marketplace</span>
-          </a>
+        <Link href="/" className="flex items-center gap-2 font-bold text-lg hover:opacity-80 transition">
+          <ShoppingBag className="w-6 h-6 text-accent" />
+          <span>Marketplace</span>
         </Link>
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-6">
-          <Link href="/products">
-            <a className="text-sm hover:text-accent transition">商品</a>
+          <Link href="/products" className="text-sm hover:text-accent transition">
+            商品
           </Link>
           {isAuthenticated && (
             <>
-              <Link href="/my-products">
-                <a className="text-sm hover:text-accent transition">我的商品</a>
+              <Link href="/my-products" className="text-sm hover:text-accent transition">
+                我的商品
               </Link>
-              <Link href="/orders">
-                <a className="text-sm hover:text-accent transition">訂單</a>
+              <Link href="/orders" className="text-sm hover:text-accent transition">
+                訂單
               </Link>
-              <Link href="/messages">
-                <a className="text-sm hover:text-accent transition">訊息</a>
+              <Link href="/messages" className="text-sm hover:text-accent transition">
+                訊息
               </Link>
             </>
           )}
