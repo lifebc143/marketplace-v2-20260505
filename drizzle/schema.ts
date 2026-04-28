@@ -97,3 +97,38 @@ export const productImages = mysqlTable("productImages", {
 
 export type ProductImage = typeof productImages.$inferSelect;
 export type InsertProductImage = typeof productImages.$inferInsert;
+
+/**
+ * Product Reviews Table
+ * Stores reviews and ratings for products
+ */
+export const productReviews = mysqlTable("productReviews", {
+  id: int("id").autoincrement().primaryKey(),
+  productId: int("productId").notNull().references(() => products.id, { onDelete: "cascade" }),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  rating: int("rating").notNull(), // 1-5 stars
+  title: varchar("title", { length: 255 }),
+  content: text("content"),
+  helpful: int("helpful").default(0).notNull(), // Count of helpful votes
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ProductReview = typeof productReviews.$inferSelect;
+export type InsertProductReview = typeof productReviews.$inferInsert;
+
+/**
+ * Review Replies Table
+ * Stores seller replies to reviews
+ */
+export const reviewReplies = mysqlTable("reviewReplies", {
+  id: int("id").autoincrement().primaryKey(),
+  reviewId: int("reviewId").notNull().references(() => productReviews.id, { onDelete: "cascade" }),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  content: text("content").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ReviewReply = typeof reviewReplies.$inferSelect;
+export type InsertReviewReply = typeof reviewReplies.$inferInsert;

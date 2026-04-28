@@ -1,12 +1,14 @@
+import { useState } from "react";
 import { useParams, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Loader2, ShoppingBag, ArrowLeft } from "lucide-react";
+import { Loader2, ShoppingBag, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function ProductDetail() {
   const params = useParams();
   const [, navigate] = useLocation();
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const productId = params?.id ? parseInt(params.id) : null;
 
   const { data: product, isLoading, error } = trpc.products.getById.useQuery(
@@ -55,6 +57,22 @@ export default function ProductDetail() {
     );
   }
 
+  const handlePrevImage = () => {
+    if (product.images && product.images.length > 0) {
+      setSelectedImageIndex((prev) =>
+        prev === 0 ? product.images.length - 1 : prev - 1
+      );
+    }
+  };
+
+  const handleNextImage = () => {
+    if (product.images && product.images.length > 0) {
+      setSelectedImageIndex((prev) =>
+        prev === product.images.length - 1 ? 0 : prev + 1
+      );
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
@@ -75,17 +93,46 @@ export default function ProductDetail() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Product Images */}
           <div className="lg:col-span-2">
-            <Card className="overflow-hidden mb-6">
-              <div className="w-full h-96 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+            <Card className="overflow-hidden mb-6 relative bg-gradient-to-br from-primary/20 to-accent/20">
+              <div
+                className="w-full flex items-center justify-center relative"
+                style={{ aspectRatio: "4/3" }}
+              >
                 {product.images && product.images.length > 0 ? (
-                  <img
-                    src={product.images[0].imageUrl}
-                    alt={product.title}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = "none";
-                    }}
-                  />
+                  <>
+                    <img
+                      key={selectedImageIndex}
+                      src={product.images[selectedImageIndex].imageUrl}
+                      alt={product.title}
+                      className="w-full h-full object-contain"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = "none";
+                      }}
+                    />
+                    {/* Navigation Arrows */}
+                    {product.images.length > 1 && (
+                      <>
+                        <button
+                          onClick={handlePrevImage}
+                          className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors z-10"
+                          aria-label="上一張圖片"
+                        >
+                          <ChevronLeft className="w-6 h-6" />
+                        </button>
+                        <button
+                          onClick={handleNextImage}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors z-10"
+                          aria-label="下一張圖片"
+                        >
+                          <ChevronRight className="w-6 h-6" />
+                        </button>
+                        {/* Image Counter */}
+                        <div className="absolute bottom-4 right-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                          {selectedImageIndex + 1} / {product.images.length}
+                        </div>
+                      </>
+                    )}
+                  </>
                 ) : (
                   <ShoppingBag className="w-24 h-24 text-muted-foreground" />
                 )}
@@ -96,8 +143,14 @@ export default function ProductDetail() {
             {product.images && product.images.length > 0 && (
               <div className="grid grid-cols-4 gap-4">
                 {product.images.map((image, idx) => (
-                  <Card key={idx} className="overflow-hidden cursor-pointer hover:shadow-md transition-shadow">
-                    <div className="w-full h-20 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center overflow-hidden">
+                  <Card
+                    key={idx}
+                    className={`overflow-hidden cursor-pointer hover:shadow-md transition-all ${
+                      selectedImageIndex === idx ? "ring-2 ring-accent" : ""
+                    }`}
+                    onClick={() => setSelectedImageIndex(idx)}
+                  >
+                    <div className="w-full h-24 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center overflow-hidden">
                       <img
                         src={image.imageUrl}
                         alt={`${product.title} - ${idx + 1}`}
