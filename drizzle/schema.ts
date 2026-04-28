@@ -25,4 +25,75 @@ export const users = mysqlTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
-// TODO: Add your tables here
+/**
+ * Product Categories Table
+ * Stores predefined product categories
+ */
+export const categories = mysqlTable("categories", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 100 }).notNull().unique(),
+  slug: varchar("slug", { length: 100 }).notNull().unique(),
+  description: text("description"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Category = typeof categories.$inferSelect;
+export type InsertCategory = typeof categories.$inferInsert;
+
+/**
+ * User Profiles Table
+ * Extended user information for marketplace
+ */
+export const userProfiles = mysqlTable("userProfiles", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().unique().references(() => users.id, { onDelete: "cascade" }),
+  bio: text("bio"),
+  avatar: varchar("avatar", { length: 500 }),
+  phone: varchar("phone", { length: 20 }),
+  address: text("address"),
+  isActive: int("isActive").default(1).notNull(), // 1 = active, 0 = inactive
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type UserProfile = typeof userProfiles.$inferSelect;
+export type InsertUserProfile = typeof userProfiles.$inferInsert;
+
+/**
+ * Products Table
+ * Main table for marketplace products
+ */
+export const products = mysqlTable("products", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  categoryId: int("categoryId").notNull().references(() => categories.id),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  price: int("price").notNull(), // Store as cents to avoid float precision issues
+  status: mysqlEnum("status", ["active", "sold", "removed", "pending_review"]).default("pending_review").notNull(),
+  condition: mysqlEnum("condition", ["like_new", "good", "fair", "poor"]).default("good").notNull(),
+  views: int("views").default(0).notNull(),
+  isAiGenerated: int("isAiGenerated").default(0).notNull(), // 1 if main image is AI-generated
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Product = typeof products.$inferSelect;
+export type InsertProduct = typeof products.$inferInsert;
+
+/**
+ * Product Images Table
+ * Stores images for each product
+ */
+export const productImages = mysqlTable("productImages", {
+  id: int("id").autoincrement().primaryKey(),
+  productId: int("productId").notNull().references(() => products.id, { onDelete: "cascade" }),
+  imageUrl: varchar("imageUrl", { length: 500 }).notNull(),
+  imageKey: varchar("imageKey", { length: 500 }).notNull(), // S3 storage key
+  displayOrder: int("displayOrder").default(0).notNull(),
+  isAiGenerated: int("isAiGenerated").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ProductImage = typeof productImages.$inferSelect;
+export type InsertProductImage = typeof productImages.$inferInsert;

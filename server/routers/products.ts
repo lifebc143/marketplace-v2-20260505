@@ -1,0 +1,220 @@
+import { z } from "zod";
+import { protectedProcedure, publicProcedure, router } from "../_core/trpc";
+import {
+  getAllCategories,
+  getActiveProducts,
+  getProductById,
+  getProductsByUserId,
+  searchProducts,
+  createProduct,
+  updateProduct,
+  getProductImages,
+  addProductImage,
+} from "../db";
+import { storagePut } from "../storage";
+import { TRPCError } from "@trpc/server";
+
+export const productsRouter = router({
+  // Get all categories
+  categories: publicProcedure.query(async () => {
+    return getAllCategories();
+  }),
+
+  // Get featured/active products with pagination
+  list: publicProcedure
+    .input(
+      z.object({
+        limit: z.number().int().positive().default(20),
+        offset: z.number().int().nonnegative().default(0),
+      })
+    )
+    .query(async ({ input }) => {
+      const products = await getActiveProducts(input.limit, input.offset);
+      return products;
+    }),
+
+  // Search and filter products
+  search: publicProcedure
+    .input(
+      z.object({
+        query: z.string().default(""),
+        categoryId: z.number().int().optional(),
+        limit: z.number().int().positive().default(20),
+        offset: z.number().int().nonnegative().default(0),
+      })
+    )
+    .query(async ({ input }) => {
+      const results = await searchProducts(
+        input.query,
+        input.categoryId,
+        input.limit,
+        input.offset
+      );
+      return results;
+    }),
+
+  // Get product details by ID
+  getById: publicProcedure
+    .input(z.object({ id: z.number().int().positive() }))
+    .query(async ({ input }) => {
+      const product = await getProductById(input.id);
+      if (!product) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Product not found",
+        });
+      }
+
+      const images = await getProductImages(product.id);
+      return { ...product, images };
+    }),
+
+  // Get user's products
+  myProducts: protectedProcedure
+    .input(
+      z.object({
+        limit: z.number().int().positive().default(20),
+        offset: z.number().int().nonnegative().default(0),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const products = await getProductsByUserId(ctx.user.id);
+      return products.slice(input.offset, input.offset + input.limit);
+    }),
+
+  // Create new product
+  create: protectedProcedure
+    .input(
+      z.object({
+        title: z.string().min(1).max(255),
+        description: z.string().min(1),
+        price: z.number().int().positive(),
+        categoryId: z.number().int().positive(),
+        condition: z.enum(["like_new", "good", "fair", "poor"]).default("good"),
+        images: z
+          .array(
+            z.object({
+              data: z.instanceof(Buffer),
+              mimeType: z.string(),
+              isAiGenerated: z.boolean().default(false),
+            })
+          )
+          .min(1)
+          .max(10),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        // Create product
+        const product = await createProduct({
+          userId: ctx.user.id,
+          categoryId: input.categoryId,
+          title: input.title,
+          description: input.description,
+          price: input.price,
+          condition: input.condition,
+          status: "pending_review",
+          isAiGenerated: input.images.some((img) => img.isAiGenerated) ? 1 : 0,
+        });
+
+        if (!product) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create product",
+          });
+        }
+
+        // Upload images
+        for (let i = 0; i < input.images.length; i++) {
+          const image = input.images[i];
+          const fileKey = `products/${product.id}/image-${i}-${Date.now()}`;
+
+          const { url, key } = await storagePut(
+            fileKey,
+            image.data,
+            image.mimeType
+          );
+
+          await addProductImage({
+            productId: product.id,
+            imageUrl: url,
+            imageKey: key,
+            displayOrder: i,
+            isAiGenerated: image.isAiGenerated ? 1 : 0,
+          });
+        }
+
+        return { id: product.id, status: "pending_review" };
+      } catch (error) {
+        console.error("[Products] Create error:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create product",
+        });
+      }
+    }),
+
+  // Update product
+  update: protectedProcedure
+    .input(
+      z.object({
+        id: z.number().int().positive(),
+        title: z.string().min(1).max(255).optional(),
+        description: z.string().min(1).optional(),
+        price: z.number().int().positive().optional(),
+        categoryId: z.number().int().positive().optional(),
+        condition: z.enum(["like_new", "good", "fair", "poor"]).optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const product = await getProductById(input.id);
+      if (!product) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Product not found",
+        });
+      }
+
+      if (product.userId !== ctx.user.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You can only edit your own products",
+        });
+      }
+
+      const updateData: any = {};
+      if (input.title !== undefined) updateData.title = input.title;
+      if (input.description !== undefined)
+        updateData.description = input.description;
+      if (input.price !== undefined) updateData.price = input.price;
+      if (input.categoryId !== undefined)
+        updateData.categoryId = input.categoryId;
+      if (input.condition !== undefined) updateData.condition = input.condition;
+
+      await updateProduct(input.id, updateData);
+      return { success: true };
+    }),
+
+  // Delist/remove product
+  delist: protectedProcedure
+    .input(z.object({ id: z.number().int().positive() }))
+    .mutation(async ({ ctx, input }) => {
+      const product = await getProductById(input.id);
+      if (!product) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Product not found",
+        });
+      }
+
+      if (product.userId !== ctx.user.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You can only delist your own products",
+        });
+      }
+
+      await updateProduct(input.id, { status: "sold" });
+      return { success: true };
+    }),
+});

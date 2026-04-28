@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { eq, like, or, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, categories, userProfiles, products, productImages, InsertUserProfile, InsertProduct, InsertProductImage } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,4 +89,129 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+/**
+ * Category queries
+ */
+export async function getAllCategories() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(categories);
+}
+
+export async function getCategoryBySlug(slug: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(categories).where(eq(categories.slug, slug)).limit(1);
+  return result[0];
+}
+
+/**
+ * User Profile queries
+ */
+export async function getUserProfileByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(userProfiles).where(eq(userProfiles.userId, userId)).limit(1);
+  return result[0];
+}
+
+export async function upsertUserProfile(userId: number, data: Partial<InsertUserProfile>) {
+  const db = await getDb();
+  if (!db) return;
+  
+  const existing = await getUserProfileByUserId(userId);
+  if (existing) {
+    await db.update(userProfiles).set(data).where(eq(userProfiles.userId, userId));
+  } else {
+    await db.insert(userProfiles).values({ userId, ...data });
+  }
+}
+
+/**
+ * Product queries
+ */
+export async function getProductById(productId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(products).where(eq(products.id, productId)).limit(1);
+  return result[0];
+}
+
+export async function getProductsByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(products).where(eq(products.userId, userId));
+}
+
+export async function getActiveProducts(limit = 20, offset = 0) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(products)
+    .where(eq(products.status, 'active'))
+    .limit(limit)
+    .offset(offset);
+}
+
+export async function searchProducts(searchTerm: string, categoryId?: number, limit = 20, offset = 0) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const conditions: any[] = [eq(products.status, 'active')];
+  
+  if (searchTerm) {
+    conditions.push(
+      or(
+        like(products.title, `%${searchTerm}%`),
+        like(products.description, `%${searchTerm}%`)
+      )
+    );
+  }
+  
+  if (categoryId) {
+    conditions.push(eq(products.categoryId, categoryId));
+  }
+  
+  const whereCondition = conditions.length === 1 ? conditions[0] : and(...(conditions as any[]));
+  return db.select().from(products).where(whereCondition as any).limit(limit).offset(offset);
+}
+
+export async function createProduct(data: InsertProduct) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  const result = await db.insert(products).values(data);
+  // Get the last inserted ID from the result
+  const insertedId = (result as any).insertId || (result as any)[0];
+  if (!insertedId) throw new Error('Failed to get inserted product ID');
+  
+  // Retrieve the newly inserted product
+  const product = await db.select().from(products)
+    .where(eq(products.id, insertedId))
+    .limit(1);
+  return product[0];
+}
+
+export async function updateProduct(productId: number, data: Partial<InsertProduct>) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  await db.update(products).set(data).where(eq(products.id, productId));
+}
+
+/**
+ * Product Image queries
+ */
+export async function getProductImages(productId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(productImages)
+    .where(eq(productImages.productId, productId))
+    .orderBy(productImages.displayOrder);
+}
+
+export async function addProductImage(data: InsertProductImage) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  await db.insert(productImages).values(data);
+  return { success: true };
+}
+
+
