@@ -259,16 +259,16 @@ export default function AdminDashboard() {
                     商品審核
                   </Button>
                 </Link>
+                <Link href="/admin/all-products">
+                  <Button variant="outline" className="w-full">
+                    <ShoppingBag className="w-4 h-4 mr-2" />
+                    商品管理
+                  </Button>
+                </Link>
                 <Link href="/admin/categories">
                   <Button variant="outline" className="w-full">
                     <Tag className="w-4 h-4 mr-2" />
                     分類管理
-                  </Button>
-                </Link>
-                <Link href="/admin/reports">
-                  <Button variant="outline" className="w-full">
-                    <AlertCircle className="w-4 h-4 mr-2" />
-                    舉報管理
                   </Button>
                 </Link>
               </div>

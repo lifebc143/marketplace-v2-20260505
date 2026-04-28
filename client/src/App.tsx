@@ -13,6 +13,7 @@ import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminUsers from "./pages/AdminUsers";
 import AdminProducts from "./pages/AdminProducts";
+import AdminAllProducts from "./pages/AdminAllProducts";
 import AdminCategories from "./pages/AdminCategories";
 
 function Router() {
@@ -27,8 +28,9 @@ function Router() {
       <Route path={"/my-products"} component={MyProducts} />
       <Route path={"/profile"} component={Profile} />
       <Route path={"/admin"} component={AdminDashboard} />
-      <Route path={"/admin/users"} component={AdminUsers} />
+         <Route path={"/admin/users"} component={AdminUsers} />
       <Route path={"/admin/products"} component={AdminProducts} />
+      <Route path={"/admin/all-products"} component={AdminAllProducts} />
       <Route path={"/admin/categories"} component={AdminCategories} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
