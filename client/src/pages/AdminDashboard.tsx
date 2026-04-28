@@ -11,12 +11,39 @@ export default function AdminDashboard() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   const [, navigate] = useLocation();
 
+  // Fetch admin data - MUST be called before any conditional returns
+  const { data: stats, isLoading: statsLoading, error: statsError } = trpc.admin.stats.useQuery(undefined, {
+    enabled: !authLoading && isAuthenticated && user?.role === "admin",
+  });
+
+  const { data: users, isLoading: usersLoading } = trpc.admin.users.useQuery(
+    {
+      limit: 5,
+      offset: 0,
+    },
+    {
+      enabled: !authLoading && isAuthenticated && user?.role === "admin",
+    }
+  );
+
+  const { data: pendingProducts, isLoading: productsLoading } = trpc.admin.pendingProducts.useQuery(
+    {
+      limit: 5,
+      offset: 0,
+    },
+    {
+      enabled: !authLoading && isAuthenticated && user?.role === "admin",
+    }
+  );
+
   // Redirect if not admin (moved to useEffect to avoid render-phase navigation)
   useEffect(() => {
     if (!authLoading && (!isAuthenticated || user?.role !== "admin")) {
       navigate("/");
     }
   }, [authLoading, isAuthenticated, user?.role, navigate]);
+
+  const isLoading = statsLoading || usersLoading || productsLoading;
 
   // Show loading while checking auth
   if (authLoading) {
@@ -31,22 +58,6 @@ export default function AdminDashboard() {
   if (!isAuthenticated || user?.role !== "admin") {
     return null;
   }
-
-  // Fetch admin data
-  const { data: stats, isLoading: statsLoading, error: statsError } = trpc.admin.stats.useQuery();
-
-  const { data: users, isLoading: usersLoading } = trpc.admin.users.useQuery({
-    limit: 5,
-    offset: 0,
-  });
-
-  const { data: pendingProducts, isLoading: productsLoading } =
-    trpc.admin.pendingProducts.useQuery({
-      limit: 5,
-      offset: 0,
-    });
-
-  const isLoading = statsLoading || usersLoading || productsLoading;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
