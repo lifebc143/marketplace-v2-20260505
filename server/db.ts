@@ -94,8 +94,37 @@ export async function getUserByOpenId(openId: string) {
  */
 export async function getAllCategories() {
   const db = await getDb();
-  if (!db) return [];
-  return db.select().from(categories);
+  if (!db) {
+    // 返回硬編碼的分類列表作為臨時解決方案
+    return [
+      { id: 1, name: '電子產品', slug: 'electronics', createdAt: new Date(), updatedAt: new Date() },
+      { id: 2, name: '服飾', slug: 'clothing', createdAt: new Date(), updatedAt: new Date() },
+      { id: 3, name: '家具', slug: 'furniture', createdAt: new Date(), updatedAt: new Date() },
+      { id: 4, name: '交通工具', slug: 'vehicles', createdAt: new Date(), updatedAt: new Date() },
+      { id: 5, name: '書籍', slug: 'books', createdAt: new Date(), updatedAt: new Date() },
+      { id: 6, name: '運動器材', slug: 'sports', createdAt: new Date(), updatedAt: new Date() },
+      { id: 7, name: '美妝', slug: 'beauty', createdAt: new Date(), updatedAt: new Date() },
+      { id: 8, name: '玩具', slug: 'toys', createdAt: new Date(), updatedAt: new Date() },
+      { id: 9, name: '其他', slug: 'others', createdAt: new Date(), updatedAt: new Date() },
+    ];
+  }
+  try {
+    return await db.select().from(categories);
+  } catch (error) {
+    console.warn('[Database] Failed to fetch categories:', error);
+    // 返回硬編碼的分類列表作為備用
+    return [
+      { id: 1, name: '電子產品', slug: 'electronics', createdAt: new Date(), updatedAt: new Date() },
+      { id: 2, name: '服飾', slug: 'clothing', createdAt: new Date(), updatedAt: new Date() },
+      { id: 3, name: '家具', slug: 'furniture', createdAt: new Date(), updatedAt: new Date() },
+      { id: 4, name: '交通工具', slug: 'vehicles', createdAt: new Date(), updatedAt: new Date() },
+      { id: 5, name: '書籍', slug: 'books', createdAt: new Date(), updatedAt: new Date() },
+      { id: 6, name: '運動器材', slug: 'sports', createdAt: new Date(), updatedAt: new Date() },
+      { id: 7, name: '美妝', slug: 'beauty', createdAt: new Date(), updatedAt: new Date() },
+      { id: 8, name: '玩具', slug: 'toys', createdAt: new Date(), updatedAt: new Date() },
+      { id: 9, name: '其他', slug: 'others', createdAt: new Date(), updatedAt: new Date() },
+    ];
+  }
 }
 
 export async function getCategoryBySlug(slug: string) {
