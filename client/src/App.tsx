@@ -11,6 +11,8 @@ import CreateProduct from "./pages/CreateProduct";
 import MyProducts from "./pages/MyProducts";
 import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminUsers from "./pages/AdminUsers";
+import AdminProducts from "./pages/AdminProducts";
 
 function Router() {
   // Route order matters: specific routes must come before dynamic ones
@@ -24,6 +26,8 @@ function Router() {
       <Route path={"/my-products"} component={MyProducts} />
       <Route path={"/profile"} component={Profile} />
       <Route path={"/admin"} component={AdminDashboard} />
+      <Route path={"/admin/users"} component={AdminUsers} />
+      <Route path={"/admin/products"} component={AdminProducts} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

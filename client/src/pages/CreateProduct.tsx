@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Buffer } from "buffer";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
@@ -6,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -13,8 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Upload, Wand2, ArrowLeft } from "lucide-react";
+import { Loader2, Upload, Wand2, ArrowLeft, X } from "lucide-react";
 import { toast } from "sonner";
 
 export default function CreateProduct() {
@@ -86,14 +87,12 @@ export default function CreateProduct() {
 
     setIsGeneratingImage(true);
     try {
-      // Call AI image generation API
-      // This would integrate with the backend's generateImage helper
       toast.info("AI 示意圖生成中...");
-      // Placeholder for actual implementation
+      // Placeholder: In production, this would call backend AI image generation
       setTimeout(() => {
-        toast.success("AI 示意圖已生成");
+        toast.success("AI 示意圖功能已準備就緒");
         setIsGeneratingImage(false);
-      }, 2000);
+      }, 1500);
     } catch (error) {
       toast.error("AI 圖片生成失敗");
       setIsGeneratingImage(false);
@@ -128,23 +127,26 @@ export default function CreateProduct() {
     setIsSubmitting(true);
 
     try {
-      // Convert images to buffers
-      const imagePromises = uploadedImages.map(
-        (file) =>
-          new Promise<{ data: Buffer; mimeType: string }>((resolve) => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-              const buffer = e.target?.result as ArrayBuffer;
-              resolve({
-                data: Buffer.from(buffer),
-                mimeType: file.type,
-              });
-            };
-            reader.readAsArrayBuffer(file);
-          })
-      );
+      // Convert images to ArrayBuffer for submission
+      const imageData: Array<{ data: Buffer; mimeType: string }> = [];
 
-      const images = await Promise.all(imagePromises);
+      for (const file of uploadedImages) {
+        const arrayBuffer = await new Promise<ArrayBuffer>((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            resolve(reader.result as ArrayBuffer);
+          };
+          reader.readAsArrayBuffer(file);
+        });
+
+        // Convert ArrayBuffer to Buffer
+        const buffer = Buffer.from(arrayBuffer);
+
+        imageData.push({
+          data: buffer,
+          mimeType: file.type,
+        });
+      }
 
       await createProductMutation.mutateAsync({
         title: formData.title,
@@ -152,11 +154,7 @@ export default function CreateProduct() {
         price: Math.round(parseFloat(formData.price) * 100),
         categoryId: parseInt(formData.categoryId),
         condition: formData.condition as any,
-        images: images.map((img) => ({
-          data: img.data,
-          mimeType: img.mimeType,
-          isAiGenerated: false,
-        })),
+        images: imageData,
       });
     } catch (error) {
       console.error("Submit error:", error);
@@ -181,69 +179,81 @@ export default function CreateProduct() {
           </Button>
           <h1 className="text-3xl font-bold">上架新商品</h1>
           <p className="text-muted-foreground mt-2">
-            填寫商品資訊並上傳圖片，讓買家快速了解您的商品
+            填寫商品資訊並上傳圖片
           </p>
         </div>
       </div>
 
       <div className="container py-8">
         <div className="max-w-2xl mx-auto">
-          <form onSubmit={handleSubmit} className="space-y-8">
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* Basic Info */}
             <Card className="p-6">
-              <h2 className="text-xl font-bold mb-6">基本資訊</h2>
+              <h2 className="text-xl font-bold mb-4">基本資訊</h2>
 
               <div className="space-y-4">
-                {/* Title */}
                 <div>
                   <Label htmlFor="title">商品標題 *</Label>
                   <Input
                     id="title"
                     name="title"
-                    placeholder="例如：全新 iPhone 15 Pro Max"
+                    placeholder="例：iPhone 13 Pro 256GB"
                     value={formData.title}
                     onChange={handleInputChange}
-                    maxLength={255}
                     className="mt-2"
                   />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {formData.title.length}/255
-                  </p>
                 </div>
 
-                {/* Description */}
                 <div>
                   <Label htmlFor="description">商品描述 *</Label>
                   <Textarea
                     id="description"
                     name="description"
-                    placeholder="詳細描述商品狀況、功能、使用年限等..."
+                    placeholder="詳細描述商品狀況、功能、缺陷等..."
                     value={formData.description}
                     onChange={handleInputChange}
-                    rows={6}
+                    rows={5}
                     className="mt-2"
                   />
                 </div>
 
-                {/* Price */}
-                <div>
-                  <Label htmlFor="price">價格 (NT$) *</Label>
-                  <Input
-                    id="price"
-                    name="price"
-                    type="number"
-                    placeholder="0"
-                    value={formData.price}
-                    onChange={handleInputChange}
-                    min="0"
-                    step="100"
-                    className="mt-2"
-                  />
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="price">價格 (NT$) *</Label>
+                    <Input
+                      id="price"
+                      name="price"
+                      type="number"
+                      placeholder="0"
+                      value={formData.price}
+                      onChange={handleInputChange}
+                      className="mt-2"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="condition">商品狀況 *</Label>
+                    <Select
+                      value={formData.condition}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({ ...prev, condition: value }))
+                      }
+                    >
+                      <SelectTrigger className="mt-2">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="like_new">全新</SelectItem>
+                        <SelectItem value="excellent">優秀</SelectItem>
+                        <SelectItem value="good">良好</SelectItem>
+                        <SelectItem value="fair">尚可</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
-                {/* Category */}
                 <div>
-                  <Label htmlFor="category">分類 *</Label>
+                  <Label htmlFor="category">商品分類 *</Label>
                   <Select
                     value={formData.categoryId}
                     onValueChange={(value) =>
@@ -251,38 +261,14 @@ export default function CreateProduct() {
                     }
                   >
                     <SelectTrigger className="mt-2">
-                      <SelectValue placeholder="選擇商品分類" />
+                      <SelectValue placeholder="選擇分類" />
                     </SelectTrigger>
                     <SelectContent>
-                      {categories?.map((category) => (
-                        <SelectItem
-                          key={category.id}
-                          value={category.id.toString()}
-                        >
-                          {category.name}
+                      {categories?.map((cat) => (
+                        <SelectItem key={cat.id} value={cat.id.toString()}>
+                          {cat.name}
                         </SelectItem>
                       ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Condition */}
-                <div>
-                  <Label htmlFor="condition">商品狀況</Label>
-                  <Select
-                    value={formData.condition}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({ ...prev, condition: value }))
-                    }
-                  >
-                    <SelectTrigger className="mt-2">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="like_new">如新</SelectItem>
-                      <SelectItem value="good">良好</SelectItem>
-                      <SelectItem value="fair">尚可</SelectItem>
-                      <SelectItem value="poor">有損傷</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -291,88 +277,78 @@ export default function CreateProduct() {
 
             {/* Images */}
             <Card className="p-6">
-              <h2 className="text-xl font-bold mb-6">商品圖片</h2>
+              <h2 className="text-xl font-bold mb-4">商品圖片</h2>
 
-              {/* Image Upload Area */}
-              <div className="mb-6">
-                <label className="block border-2 border-dashed border-border rounded-lg p-8 text-center cursor-pointer hover:border-accent transition-colors">
+              <div className="space-y-4">
+                {/* Image Upload */}
+                <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:bg-muted/50 transition">
                   <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                  <p className="font-medium">點擊或拖拽上傳圖片</p>
-                  <p className="text-sm text-muted-foreground">
-                    支援 JPG、PNG 格式，最多 10 張
+                  <p className="text-sm text-muted-foreground mb-2">
+                    拖拽圖片或點擊選擇
                   </p>
-                  <input
+                  <Input
                     type="file"
                     multiple
                     accept="image/*"
                     onChange={handleImageUpload}
                     className="hidden"
+                    id="image-upload"
                   />
-                </label>
-              </div>
-
-              {/* AI Image Generation */}
-              <div className="mb-6 p-4 bg-accent/10 rounded-lg border border-accent/20">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium mb-1">AI 示意圖生成</p>
-                    <p className="text-sm text-muted-foreground">
-                      根據商品描述自動生成示意圖
-                    </p>
-                  </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={generateAIImage}
-                    disabled={isGeneratingImage || !formData.description.trim()}
+                  <Label
+                    htmlFor="image-upload"
+                    className="cursor-pointer text-accent hover:underline"
                   >
-                    {isGeneratingImage ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        生成中...
-                      </>
-                    ) : (
-                      <>
-                        <Wand2 className="w-4 h-4 mr-2" />
-                        生成圖片
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </div>
-
-              {/* Uploaded Images Preview */}
-              {uploadedImages.length > 0 && (
-                <div>
-                  <p className="font-medium mb-3">
-                    已上傳 {uploadedImages.length}/10 張圖片
+                    選擇圖片
+                  </Label>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    最多 10 張，支援 JPG、PNG 格式
                   </p>
-                  <div className="grid grid-cols-3 gap-4">
+                </div>
+
+                {/* AI Image Generation */}
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full gap-2"
+                  onClick={generateAIImage}
+                  disabled={isGeneratingImage}
+                >
+                  <Wand2 className="w-4 h-4" />
+                  {isGeneratingImage ? "生成中..." : "AI 示意圖生成"}
+                </Button>
+
+                {/* Uploaded Images Preview */}
+                {uploadedImages.length > 0 && (
+                  <div className="grid grid-cols-4 gap-4">
                     {uploadedImages.map((file, index) => (
                       <div
                         key={index}
-                        className="relative group rounded-lg overflow-hidden bg-muted"
+                        className="relative group aspect-square bg-muted rounded-lg overflow-hidden"
                       >
                         <img
                           src={URL.createObjectURL(file)}
-                          alt={`Preview ${index}`}
-                          className="w-full h-24 object-cover"
+                          alt={`Preview ${index + 1}`}
+                          className="w-full h-full object-cover"
                         />
                         <button
                           type="button"
                           onClick={() => removeImage(index)}
-                          className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                          className="absolute top-1 right-1 bg-destructive text-white p-1 rounded opacity-0 group-hover:opacity-100 transition"
                         >
-                          <span className="text-white text-sm">移除</span>
+                          <X className="w-4 h-4" />
                         </button>
                       </div>
                     ))}
                   </div>
-                </div>
-              )}
+                )}
+
+                <p className="text-sm text-muted-foreground">
+                  已上傳 {uploadedImages.length} 張圖片
+                </p>
+              </div>
             </Card>
 
-            {/* Submit Button */}
+            {/* Submit */}
             <div className="flex gap-4">
               <Button
                 type="button"
