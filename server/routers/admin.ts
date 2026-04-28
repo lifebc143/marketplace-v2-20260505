@@ -234,20 +234,25 @@ export const adminRouter = router({
       }
 
       try {
-        await db.insert(categories).values({
+        const result = await db.insert(categories).values({
           name: input.name,
           slug: input.slug,
+          description: null,
         });
 
         return { success: true };
       } catch (error: any) {
-        if (error.code === "ER_DUP_ENTRY") {
+        console.error("[Admin] Error creating category:", error);
+        if (error.code === "ER_DUP_ENTRY" || error.message?.includes("Duplicate entry")) {
           throw new TRPCError({
             code: "CONFLICT",
-            message: "Category slug already exists",
+            message: "分類名稱或代碼已存在",
           });
         }
-        throw error;
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error.message || "新增分類失敗",
+        });
       }
     }),
 
@@ -292,13 +297,17 @@ export const adminRouter = router({
 
         return { success: true };
       } catch (error: any) {
-        if (error.code === "ER_DUP_ENTRY") {
+        console.error("[Admin] Error updating category:", error);
+        if (error.code === "ER_DUP_ENTRY" || error.message?.includes("Duplicate entry")) {
           throw new TRPCError({
             code: "CONFLICT",
-            message: "Category slug already exists",
+            message: "分類名稱或代碼已存在",
           });
         }
-        throw error;
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error.message || "更新分類失敗",
+        });
       }
     }),
 
