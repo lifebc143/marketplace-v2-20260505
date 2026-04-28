@@ -21,7 +21,26 @@ export default function Orders() {
     { enabled: !!selectedOrderId }
   );
 
+  // 獲取賣家信息
+  const { data: sellerInfo } = trpc.orders.getSellerInfo.useQuery(
+    { orderId: selectedOrderId! },
+    { enabled: !!selectedOrderId }
+  );
+
   const confirmOrderMutation = trpc.orders.confirm.useMutation();
+  const contactSellerMutation = trpc.orders.contactSeller.useMutation();
+
+  const handleContactSeller = async () => {
+    if (!selectedOrderId) return;
+
+    try {
+      await contactSellerMutation.mutateAsync({ orderId: selectedOrderId });
+      toast.success("已向賣家發送你的聯絡信息");
+    } catch (error) {
+      console.error("Failed to contact seller:", error);
+      toast.error("聯絡賣家失敗，請重試");
+    }
+  };
 
   if (!user) {
     return (
@@ -213,29 +232,74 @@ export default function Orders() {
                     )}
                   </div>
 
-                  <div className="mb-6">
+                  <div className="mb-6 pb-6 border-b border-border">
                     <p className="text-xs text-muted-foreground mb-2">訂單總額</p>
                     <p className="text-3xl font-bold text-accent">
                       NT${(selectedOrder.totalAmount / 100).toFixed(0)}
                     </p>
                   </div>
 
-                  {selectedOrder.status === "shipped" && (
+                  {/* 賣家信息 */}
+                  {sellerInfo && (
+                    <div className="mb-6 pb-6 border-b border-border">
+                      <p className="text-xs text-muted-foreground mb-3">賣家聯絡信息：</p>
+                      <div className="space-y-2">
+                        <div>
+                          <p className="text-xs text-muted-foreground">電話</p>
+                          <p className="font-medium text-sm">{sellerInfo.phone}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">地址</p>
+                          <p className="font-medium text-sm">{sellerInfo.address}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="bg-secondary/10 rounded-lg p-3 mb-6 border border-border">
+                    <p className="text-xs font-bold text-foreground mb-2">重要提示：</p>
+                    <ul className="text-xs text-muted-foreground space-y-1 ml-3">
+                      <li>本訂單為個人交易行為</li>
+                      <li>網站不涉及任何金流</li>
+                      <li>請與賣家直接聯繫</li>
+                      <li>交易安全由雙方負責</li>
+                    </ul>
+                  </div>
+
+                  <div className="space-y-2">
+                    {selectedOrder.status === "shipped" && (
+                      <Button
+                        className="w-full bg-accent hover:bg-accent/90"
+                        onClick={handleConfirmOrder}
+                        disabled={confirmOrderMutation.isPending}
+                      >
+                        {confirmOrderMutation.isPending ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            確認中...
+                          </>
+                        ) : (
+                          "確認收貨"
+                        )}
+                      </Button>
+                    )}
+                    
                     <Button
-                      className="w-full bg-accent hover:bg-accent/90"
-                      onClick={handleConfirmOrder}
-                      disabled={confirmOrderMutation.isPending}
+                      variant="outline"
+                      className="w-full"
+                      onClick={handleContactSeller}
+                      disabled={contactSellerMutation.isPending}
                     >
-                      {confirmOrderMutation.isPending ? (
+                      {contactSellerMutation.isPending ? (
                         <>
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          確認中...
+                          發送中...
                         </>
                       ) : (
-                        "確認收貨"
+                        "聯絡賣家"
                       )}
                     </Button>
-                  )}
+                  </div>
                 </Card>
               </div>
             )}

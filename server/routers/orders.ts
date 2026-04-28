@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../_core/trpc";
-import { createOrder, addOrderItem, getOrdersByBuyerId, getOrderById, getProductById, updateOrderStatus } from "../db";
+import { createOrder, addOrderItem, getOrdersByBuyerId, getOrderById, getProductById, updateOrderStatus, getUserProfile } from "../db";
 import { TRPCError } from "@trpc/server";
 
 export const ordersRouter = router({
@@ -119,6 +119,89 @@ export const ordersRouter = router({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "無法獲取訂單",
+        });
+      }
+    }),
+
+  // 取得賣家信息
+  getSellerInfo: protectedProcedure
+    .input(z.object({ orderId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      try {
+        const order = await getOrderById(input.orderId);
+        if (!order) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "訂單不存在",
+          });
+        }
+
+        // 驗證用戶是買家或賣家
+        if (order.buyerId !== ctx.user.id && order.sellerId !== ctx.user.id) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "無權訪問此訂單信息",
+          });
+        }
+
+        const sellerProfile = await getUserProfile(order.sellerId);
+        return {
+          sellerId: order.sellerId,
+          phone: sellerProfile?.phone || "未提供",
+          address: sellerProfile?.address || "未提供",
+        };
+      } catch (error) {
+        if (error instanceof TRPCError) throw error;
+        console.error("Failed to fetch seller info:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "無法取得賣家信息",
+        });
+      }
+    }),
+
+  // 聯絡賣家
+  contactSeller: protectedProcedure
+    .input(z.object({ orderId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const order = await getOrderById(input.orderId);
+        if (!order) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "訂單不存在",
+          });
+        }
+
+        // 只有買家可以聯絡賣家
+        if (order.buyerId !== ctx.user.id) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "只有買家可以聯絡賣家",
+          });
+        }
+
+        // 取得買家信息
+        const buyerProfile = await getUserProfile(order.buyerId);
+
+        // 返回買家信息供賣家聯絡
+        return {
+          success: true,
+          message: "已向賣家發送你的聯絡信息",
+          buyerInfo: {
+            orderId: order.id,
+            recipientName: order.recipientName,
+            recipientPhone: order.recipientPhone,
+            recipientAddress: order.recipientAddress,
+            notes: order.notes,
+          },
+        };
+      } catch (error) {
+        if (error instanceof TRPCError) throw error;
+        console.error("Failed to contact seller:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "無法聯絡賣家",
         });
       }
     }),

@@ -12,7 +12,7 @@ import { toast } from "sonner";
 export default function Checkout() {
   const [, navigate] = useLocation();
   const { user } = useAuth();
-  
+
   // 從 URL 查詢參數中獲取商品 ID 和數量
   const urlParams = new URLSearchParams(window.location.search);
   const productId = urlParams.get("productId");
@@ -28,6 +28,7 @@ export default function Checkout() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderCreated, setOrderCreated] = useState(false);
   const [orderId, setOrderId] = useState<number | null>(null);
+  const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
 
   // 獲取商品信息
   const { data: product, isLoading: productLoading } = trpc.products.getById.useQuery(
@@ -78,6 +79,12 @@ export default function Checkout() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // 驗證免責聲明
+    if (!disclaimerAccepted) {
+      toast.error("請確認已閱讀並同意免責聲明");
+      return;
+    }
+
     // 驗證表單
     if (!formData.recipientName.trim()) {
       toast.error("請輸入收件人姓名");
@@ -127,7 +134,20 @@ export default function Checkout() {
             </div>
             <h1 className="text-3xl font-bold mb-4">訂單已成功創建</h1>
             <p className="text-muted-foreground mb-2">訂單編號：#{orderId}</p>
-            <p className="text-muted-foreground mb-6">感謝您的購買，我們將盡快與您聯繫</p>
+            <p className="text-muted-foreground mb-6">感謝您的購買，請與賣家直接聯繫以完成交易</p>
+
+            {/* 免責聲明 */}
+            <div className="bg-secondary/10 rounded-lg p-4 mb-6 text-left border border-border">
+              <p className="text-sm font-bold text-foreground mb-3">重要提示 - 免責聲明：</p>
+              <ul className="text-xs text-muted-foreground space-y-2 ml-4">
+                <li>✓ 本訂單代表買賣雙方的個人交易行為</li>
+                <li>✓ 本網站僅提供交易平台，不涉及任何金流處理</li>
+                <li>✓ 交易的安全性、商品品質及售後服務由買賣雙方自行負責</li>
+                <li>✓ 本網站對交易過程中發生的任何糾紛不承擔責任</li>
+                <li>✓ 請與賣家直接聯繫確認交易細節和付款方式</li>
+              </ul>
+            </div>
+
             <div className="space-y-3">
               <Button
                 className="w-full bg-accent hover:bg-accent/90"
@@ -220,10 +240,34 @@ export default function Checkout() {
                   />
                 </div>
 
+                {/* 免責聲明 */}
+                <div className="bg-secondary/10 rounded-lg p-4 border border-border">
+                  <p className="text-sm font-bold text-foreground mb-3">免責聲明：</p>
+                  <ul className="text-xs text-muted-foreground space-y-2 ml-4 mb-4">
+                    <li>• 本訂單代表買賣雙方的個人交易行為</li>
+                    <li>• 本網站僅提供交易平台，不涉及任何金流處理</li>
+                    <li>• 交易的安全性、商品品質及售後服務由買賣雙方自行負責</li>
+                    <li>• 本網站對交易過程中發生的任何糾紛不承擔責任</li>
+                    <li>• 請與賣家直接聯繫確認交易細節和付款方式</li>
+                  </ul>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={disclaimerAccepted}
+                      onChange={(e) => setDisclaimerAccepted(e.target.checked)}
+                      disabled={isSubmitting}
+                      className="w-4 h-4 rounded"
+                    />
+                    <span className="text-xs text-muted-foreground">
+                      我已閱讀並同意上述免責聲明
+                    </span>
+                  </label>
+                </div>
+
                 <Button
                   type="submit"
                   className="w-full bg-accent hover:bg-accent/90"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !disclaimerAccepted}
                 >
                   {isSubmitting ? (
                     <>
@@ -293,9 +337,9 @@ export default function Checkout() {
 
               {/* Info */}
               <div className="bg-secondary/10 rounded p-4 text-xs text-muted-foreground">
-                <p className="mb-2">✓ 安全交易保障</p>
-                <p className="mb-2">✓ 買家保護計劃</p>
-                <p>✓ 7天內可退貨</p>
+                <p className="mb-2">ℹ️ 個人交易平台</p>
+                <p className="mb-2">ℹ️ 買賣雙方自行協商</p>
+                <p>ℹ️ 網站不涉及金流</p>
               </div>
             </Card>
           </div>
