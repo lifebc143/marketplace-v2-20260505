@@ -132,3 +132,41 @@ export const reviewReplies = mysqlTable("reviewReplies", {
 
 export type ReviewReply = typeof reviewReplies.$inferSelect;
 export type InsertReviewReply = typeof reviewReplies.$inferInsert;
+
+
+/**
+ * Orders Table
+ * Stores purchase orders
+ */
+export const orders = mysqlTable("orders", {
+  id: int("id").autoincrement().primaryKey(),
+  buyerId: int("buyerId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  sellerId: int("sellerId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  status: mysqlEnum("status", ["pending", "confirmed", "shipped", "delivered", "cancelled"]).default("pending").notNull(),
+  totalAmount: int("totalAmount").notNull(), // Total price in cents
+  recipientName: varchar("recipientName", { length: 100 }).notNull(),
+  recipientPhone: varchar("recipientPhone", { length: 20 }).notNull(),
+  recipientAddress: text("recipientAddress").notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Order = typeof orders.$inferSelect;
+export type InsertOrder = typeof orders.$inferInsert;
+
+/**
+ * Order Items Table
+ * Stores individual products in each order
+ */
+export const orderItems = mysqlTable("orderItems", {
+  id: int("id").autoincrement().primaryKey(),
+  orderId: int("orderId").notNull().references(() => orders.id, { onDelete: "cascade" }),
+  productId: int("productId").notNull().references(() => products.id, { onDelete: "restrict" }),
+  quantity: int("quantity").default(1).notNull(),
+  price: int("price").notNull(), // Price per unit in cents
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type OrderItem = typeof orderItems.$inferSelect;
+export type InsertOrderItem = typeof orderItems.$inferInsert;

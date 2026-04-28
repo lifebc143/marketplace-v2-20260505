@@ -11,6 +11,7 @@ export default function ProductDetail() {
   const params = useParams();
   const [, navigate] = useLocation();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  
   const productId = params?.id ? parseInt(params.id) : null;
 
   const { data: product, isLoading, error } = trpc.products.getById.useQuery(
@@ -206,7 +207,7 @@ export default function ProductDetail() {
                 <Button 
                   className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
                   onClick={() => {
-                    toast.info("購買功能即將推出");
+                    navigate(`/checkout?productId=${product.id}&quantity=1`);
                   }}
                 >
                   立即購買

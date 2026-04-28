@@ -1,6 +1,6 @@
 import { eq, like, or, and, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, categories, userProfiles, products, productImages, InsertUserProfile, InsertProduct, InsertProductImage } from "../drizzle/schema";
+import { InsertUser, users, categories, userProfiles, products, productImages, InsertUserProfile, InsertProduct, InsertProductImage, orders, orderItems, InsertOrder, InsertOrderItem } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -441,4 +441,61 @@ export async function deleteProduct(productId: number) {
   if (!db) throw new Error('Database not available');
   
   await db.delete(products).where(eq(products.id, productId));
+}
+
+
+// ===== Orders =====
+
+export async function createOrder(data: InsertOrder): Promise<number> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(orders).values(data);
+  return result[0].insertId;
+}
+
+export async function getOrderById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getOrdersByBuyerId(buyerId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(orders).where(eq(orders.buyerId, buyerId));
+}
+
+export async function getOrdersBySellerId(sellerId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(orders).where(eq(orders.sellerId, sellerId));
+}
+
+export async function updateOrderStatus(id: number, status: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(orders).set({ status: status as any }).where(eq(orders.id, id));
+}
+
+// ===== Order Items =====
+
+export async function addOrderItem(data: InsertOrderItem): Promise<number> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(orderItems).values(data);
+  return result[0].insertId;
+}
+
+export async function getOrderItems(orderId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(orderItems).where(eq(orderItems.orderId, orderId));
 }

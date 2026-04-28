@@ -15,6 +15,8 @@ import AdminUsers from "./pages/AdminUsers";
 import AdminProducts from "./pages/AdminProducts";
 import AdminAllProducts from "./pages/AdminAllProducts";
 import AdminCategories from "./pages/AdminCategories";
+import Checkout from "./pages/Checkout";
+import Orders from "./pages/Orders";
 
 function Router() {
   // Route order matters: specific routes must come before dynamic ones
@@ -24,11 +26,13 @@ function Router() {
       <Route path={"/"} component={Home} />
       <Route path={"/products"} component={ProductList} />
       <Route path={"/products/create"} component={CreateProduct} />
+      <Route path={"/checkout"} component={Checkout} />
+      <Route path={"/orders"} component={Orders} />
       <Route path={"/products/:id"} component={ProductDetail} />
       <Route path={"/my-products"} component={MyProducts} />
       <Route path={"/profile"} component={Profile} />
       <Route path={"/admin"} component={AdminDashboard} />
-         <Route path={"/admin/users"} component={AdminUsers} />
+      <Route path={"/admin/users"} component={AdminUsers} />
       <Route path={"/admin/products"} component={AdminProducts} />
       <Route path={"/admin/all-products"} component={AdminAllProducts} />
       <Route path={"/admin/categories"} component={AdminCategories} />
