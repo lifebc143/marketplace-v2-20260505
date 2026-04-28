@@ -4,6 +4,8 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Loader2, ShoppingBag, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { toast } from "sonner";
 
 export default function ProductDetail() {
   const params = useParams();
@@ -201,10 +203,21 @@ export default function ProductDetail() {
 
               {/* Action Buttons */}
               <div className="space-y-3">
-                <Button className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
+                <Button 
+                  className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
+                  onClick={() => {
+                    toast.info("購買功能即將推出");
+                  }}
+                >
                   立即購買
                 </Button>
-                <Button variant="outline" className="w-full">
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => {
+                    toast.info("聯絡賣家功能即將推出");
+                  }}
+                >
                   聯絡賣家
                 </Button>
               </div>
