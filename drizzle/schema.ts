@@ -170,3 +170,23 @@ export const orderItems = mysqlTable("orderItems", {
 
 export type OrderItem = typeof orderItems.$inferSelect;
 export type InsertOrderItem = typeof orderItems.$inferInsert;
+
+
+/**
+ * Reviews Table
+ * Stores product reviews and ratings
+ */
+export const reviews = mysqlTable("reviews", {
+  id: int("id").autoincrement().primaryKey(),
+  productId: int("productId").notNull().references(() => products.id, { onDelete: "cascade" }),
+  buyerId: int("buyerId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  orderId: int("orderId").notNull().references(() => orders.id, { onDelete: "cascade" }),
+  rating: int("rating").notNull(), // Rating from 1 to 5
+  title: varchar("title", { length: 100 }).notNull(),
+  content: text("content").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Review = typeof reviews.$inferSelect;
+export type InsertReview = typeof reviews.$inferInsert;

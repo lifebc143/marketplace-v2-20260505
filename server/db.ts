@@ -1,6 +1,6 @@
-import { eq, like, or, and, desc } from "drizzle-orm";
+import { eq, like, or, and, desc, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, categories, userProfiles, products, productImages, InsertUserProfile, InsertProduct, InsertProductImage, orders, orderItems, InsertOrder, InsertOrderItem } from "../drizzle/schema";
+import { InsertUser, users, categories, userProfiles, products, productImages, InsertUserProfile, InsertProduct, InsertProductImage, orders, orderItems, InsertOrder, InsertOrderItem, reviews, InsertReview, Review } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -498,4 +498,86 @@ export async function getOrderItems(orderId: number) {
   if (!db) return [];
   
   return await db.select().from(orderItems).where(eq(orderItems.orderId, orderId));
+}
+
+
+/**
+ * Review queries
+ */
+export async function getReviewsByProductId(productId: number, limit: number = 10, offset: number = 0) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db
+    .select()
+    .from(reviews)
+    .where(eq(reviews.productId, productId))
+    .orderBy(desc(reviews.createdAt))
+    .limit(limit)
+    .offset(offset);
+}
+
+export async function getReviewById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(reviews).where(eq(reviews.id, id)).limit(1);
+  return result[0];
+}
+
+export async function createReview(data: InsertReview) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  
+  const result = await db.insert(reviews).values(data);
+  return result;
+}
+
+export async function updateReview(id: number, data: Partial<InsertReview>) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  
+  await db.update(reviews).set(data).where(eq(reviews.id, id));
+}
+
+export async function deleteReview(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  
+  await db.delete(reviews).where(eq(reviews.id, id));
+}
+
+export async function getAverageRating(productId: number) {
+  const db = await getDb();
+  if (!db) return 0;
+  
+  const result = await db.select({
+    avgRating: sql`AVG(${reviews.rating})`
+  }).from(reviews).where(eq(reviews.productId, productId));
+  
+  return result[0]?.avgRating ? parseFloat(result[0].avgRating as string) : 0;
+}
+
+export async function getReviewCount(productId: number) {
+  const db = await getDb();
+  if (!db) return 0;
+  
+  const result = await db.select({
+    count: sql`COUNT(*)`
+  }).from(reviews).where(eq(reviews.productId, productId));
+  
+  return result[0]?.count ? parseInt(result[0].count as string) : 0;
+}
+
+export async function getReviewByOrderAndProduct(orderId: number, productId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db
+    .select()
+    .from(reviews)
+    .where(and(eq(reviews.orderId, orderId), eq(reviews.productId, productId)))
+    .limit(1);
+  
+  return result[0];
 }
