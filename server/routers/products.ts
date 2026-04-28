@@ -149,7 +149,12 @@ export const productsRouter = router({
 
         return { id: product.id, status: "pending_review" };
       } catch (error) {
-        console.error("[Products] Create error:", error);
+        console.error("[Products] Create error:", {
+          error: error instanceof Error ? error.message : String(error),
+          sqlMessage: (error as any)?.sqlMessage,
+          code: (error as any)?.code,
+          errno: (error as any)?.errno,
+        });
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to create product",

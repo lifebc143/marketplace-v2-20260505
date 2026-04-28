@@ -70,7 +70,12 @@ export const ordersRouter = router({
         return { orderId, status: "pending" };
       } catch (error) {
         if (error instanceof TRPCError) throw error;
-        console.error("Failed to create order:", error);
+        console.error("Failed to create order:", {
+          error: error instanceof Error ? error.message : String(error),
+          sqlMessage: (error as any)?.sqlMessage,
+          code: (error as any)?.code,
+          errno: (error as any)?.errno,
+        });
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "無法創建訂單",
@@ -184,7 +189,12 @@ export const ordersRouter = router({
 
         // 取得買家信息
         const buyerProfile = await getUserProfile(order.buyerId);
-        const sellerProfile = await getUserProfile(order.sellerId);
+        if (!buyerProfile) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "買家信息不存在",
+          });
+        }
 
         // 向賣家發送通知
         try {
@@ -211,10 +221,15 @@ export const ordersRouter = router({
         };
       } catch (error) {
         if (error instanceof TRPCError) throw error;
-        console.error("Failed to contact seller:", error);
+        console.error("Failed to contact seller:", {
+          error: error instanceof Error ? error.message : String(error),
+          sqlMessage: (error as any)?.sqlMessage,
+          code: (error as any)?.code,
+          errno: (error as any)?.errno,
+        });
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "無法聯絡賣家",
+          message: "無法联絡賣家",
         });
       }
     }),
