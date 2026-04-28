@@ -36,9 +36,10 @@ export default function Orders() {
     try {
       await contactSellerMutation.mutateAsync({ orderId: selectedOrderId });
       toast.success("已向賣家發送你的聯絡信息");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to contact seller:", error);
-      toast.error("聯絡賣家失敗，請重試");
+      const errorMessage = error?.data?.message || error?.message || "聯絡賣家失敗，請重試";
+      toast.error(errorMessage);
     }
   };
 

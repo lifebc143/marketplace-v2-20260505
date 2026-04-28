@@ -114,9 +114,10 @@ export default function Checkout() {
       setOrderId(result.orderId);
       setOrderCreated(true);
       toast.success("訂單已成功創建！");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to create order:", error);
-      toast.error("創建訂單失敗，請重試");
+      const errorMessage = error?.data?.message || error?.message || "創建訂單失敗，請重試";
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

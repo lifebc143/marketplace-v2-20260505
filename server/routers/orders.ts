@@ -2,6 +2,7 @@ import { z } from "zod";
 import { protectedProcedure, router } from "../_core/trpc";
 import { createOrder, addOrderItem, getOrdersByBuyerId, getOrderById, getProductById, updateOrderStatus, getUserProfile } from "../db";
 import { TRPCError } from "@trpc/server";
+import { notifyOwner } from "../_core/notification";
 
 export const ordersRouter = router({
   // 創建訂單
@@ -183,6 +184,17 @@ export const ordersRouter = router({
 
         // 取得買家信息
         const buyerProfile = await getUserProfile(order.buyerId);
+        const sellerProfile = await getUserProfile(order.sellerId);
+
+        // 向賣家發送通知
+        try {
+          await notifyOwner({
+            title: `新的訂單聯絡 - 訂單 #${order.id}`,
+            content: `買家想聯絡你。\n訂單編號: #${order.id}\n買家電話: ${buyerProfile?.phone || "未提供"}\n收件地址: ${order.recipientAddress}\n備註: ${order.notes || "無"}`,
+          });
+        } catch (notifyError) {
+          console.error("Failed to send seller notification:", notifyError);
+        }
 
         // 返回買家信息供賣家聯絡
         return {
@@ -190,6 +202,7 @@ export const ordersRouter = router({
           message: "已向賣家發送你的聯絡信息",
           buyerInfo: {
             orderId: order.id,
+            buyerPhone: buyerProfile?.phone || "未提供",
             recipientName: order.recipientName,
             recipientPhone: order.recipientPhone,
             recipientAddress: order.recipientAddress,

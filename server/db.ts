@@ -451,7 +451,9 @@ export async function createOrder(data: InsertOrder): Promise<number> {
   if (!db) throw new Error("Database not available");
   
   const result = await db.insert(orders).values(data);
-  return result[0].insertId;
+  const insertId = (result as any)?.insertId ?? (result as any)?.[0]?.insertId;
+  if (!insertId) throw new Error('Failed to create order: no insertId returned');
+  return insertId;
 }
 
 export async function getOrderById(id: number) {
@@ -490,7 +492,9 @@ export async function addOrderItem(data: InsertOrderItem): Promise<number> {
   if (!db) throw new Error("Database not available");
   
   const result = await db.insert(orderItems).values(data);
-  return result[0].insertId;
+  const insertId = (result as any)?.insertId ?? (result as any)?.[0]?.insertId;
+  if (!insertId) throw new Error('Failed to add order item: no insertId returned');
+  return insertId;
 }
 
 export async function getOrderItems(orderId: number) {
