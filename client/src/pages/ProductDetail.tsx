@@ -77,7 +77,18 @@ export default function ProductDetail() {
           <div className="lg:col-span-2">
             <Card className="overflow-hidden mb-6">
               <div className="w-full h-96 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
-                <ShoppingBag className="w-24 h-24 text-muted-foreground" />
+                {product.images && product.images.length > 0 ? (
+                  <img
+                    src={product.images[0].imageUrl}
+                    alt={product.title}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = "none";
+                    }}
+                  />
+                ) : (
+                  <ShoppingBag className="w-24 h-24 text-muted-foreground" />
+                )}
               </div>
             </Card>
 
@@ -86,8 +97,15 @@ export default function ProductDetail() {
               <div className="grid grid-cols-4 gap-4">
                 {product.images.map((image, idx) => (
                   <Card key={idx} className="overflow-hidden cursor-pointer hover:shadow-md transition-shadow">
-                    <div className="w-full h-20 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
-                      <ShoppingBag className="w-8 h-8 text-muted-foreground" />
+                    <div className="w-full h-20 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center overflow-hidden">
+                      <img
+                        src={image.imageUrl}
+                        alt={`${product.title} - ${idx + 1}`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = "none";
+                        }}
+                      />
                     </div>
                   </Card>
                 ))}

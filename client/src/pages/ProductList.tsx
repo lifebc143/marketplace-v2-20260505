@@ -10,10 +10,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, ShoppingBag, Search } from "lucide-react";
-import { Link } from "wouter";
+import { Loader2, ShoppingBag, Search, ArrowLeft } from "lucide-react";
+import { Link, useLocation } from "wouter";
 
 export default function ProductList() {
+  const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [offset, setOffset] = useState(0);
@@ -40,6 +41,17 @@ export default function ProductList() {
       {/* Header */}
       <div className="bg-gradient-to-r from-primary/10 to-accent/10 border-b border-border py-8">
         <div className="container">
+          <div className="flex items-center gap-4 mb-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setLocation("/")}
+              className="gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              返回首頁
+            </Button>
+          </div>
           <h1 className="text-4xl font-bold mb-2">商品列表</h1>
           <p className="text-muted-foreground">
             搜尋和篩選您感興趣的二手商品
@@ -124,8 +136,8 @@ export default function ProductList() {
                   {products.map((product) => (
                     <Link key={product.id} href={`/products/${product.id}`}>
                       <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full flex flex-col">
-                        {/* Product Image Placeholder */}
-                        <div className="w-full h-48 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+                        {/* Product Image */}
+                        <div className="w-full h-48 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center overflow-hidden">
                           <ShoppingBag className="w-12 h-12 text-muted-foreground" />
                         </div>
 
