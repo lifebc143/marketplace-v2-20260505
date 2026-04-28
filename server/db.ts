@@ -183,10 +183,20 @@ export async function getActiveProducts(limit: number = 20, offset: number = 0) 
   const db = await getDb();
   if (!db) return [];
   
-  return db.select().from(products)
+  const productList = await db.select().from(products)
     .where(eq(products.status, 'active'))
     .limit(limit)
     .offset(offset);
+  
+  // Get images for each product
+  const productsWithImages = await Promise.all(
+    productList.map(async (product) => {
+      const images = await getProductImages(product.id);
+      return { ...product, images };
+    })
+  );
+  
+  return productsWithImages;
 }
 
 export async function getProductById(id: number) {
@@ -194,7 +204,12 @@ export async function getProductById(id: number) {
   if (!db) return undefined;
   
   const result = await db.select().from(products).where(eq(products.id, id)).limit(1);
-  return result[0];
+  const product = result[0];
+  
+  if (!product) return undefined;
+  
+  const images = await getProductImages(product.id);
+  return { ...product, images };
 }
 
 export async function getProductsByUserId(userId: number) {
@@ -224,7 +239,17 @@ export async function searchProducts(query: string, categoryId?: number, limit: 
   }
   
   const whereCondition = conditions.length === 1 ? conditions[0] : and(...(conditions as any[]));
-  return db.select().from(products).where(whereCondition as any).limit(limit).offset(offset);
+  const productList = await db.select().from(products).where(whereCondition as any).limit(limit).offset(offset);
+  
+  // Get images for each product
+  const productsWithImages = await Promise.all(
+    productList.map(async (product) => {
+      const images = await getProductImages(product.id);
+      return { ...product, images };
+    })
+  );
+  
+  return productsWithImages;
 }
 
 export async function createProduct(data: InsertProduct) {

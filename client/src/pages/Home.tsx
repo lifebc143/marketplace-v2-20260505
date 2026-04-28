@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Loader2, ShoppingBag, Plus } from "lucide-react";
 import { Link } from "wouter";
 
+
 export default function Home() {
   const { user, isAuthenticated } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState<number | undefined>();
@@ -110,9 +111,20 @@ export default function Home() {
               {products.map((product) => (
                 <Link key={product.id} href={`/products/${product.id}`}>
                   <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full flex flex-col">
-                    {/* Placeholder for product image */}
-                    <div className="w-full h-48 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
-                      <ShoppingBag className="w-12 h-12 text-muted-foreground" />
+                    {/* Product Image */}
+                    <div className="w-full h-48 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center overflow-hidden">
+                      {(product as any).images && (product as any).images.length > 0 ? (
+                        <img
+                          src={(product as any).images[0].imageUrl}
+                          alt={product.title}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = "none";
+                          }}
+                        />
+                      ) : (
+                        <ShoppingBag className="w-12 h-12 text-muted-foreground" />
+                      )}
                     </div>
 
                     <div className="p-4 flex-1 flex flex-col">
