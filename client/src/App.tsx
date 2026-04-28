@@ -7,14 +7,23 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import ProductList from "./pages/ProductList";
 import ProductDetail from "./pages/ProductDetail";
+import CreateProduct from "./pages/CreateProduct";
+import MyProducts from "./pages/MyProducts";
+import Profile from "./pages/Profile";
+import AdminDashboard from "./pages/AdminDashboard";
 
 function Router() {
-  // make sure to consider if you need authentication for certain routes
+  // Route order matters: specific routes must come before dynamic ones
+  // /products/create must come before /products/:id to avoid being matched as a product ID
   return (
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path={"/products"} component={ProductList} />
+      <Route path={"/products/create"} component={CreateProduct} />
       <Route path={"/products/:id"} component={ProductDetail} />
+      <Route path={"/my-products"} component={MyProducts} />
+      <Route path={"/profile"} component={Profile} />
+      <Route path={"/admin"} component={AdminDashboard} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
@@ -31,7 +40,7 @@ function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider
-        defaultTheme="light"
+        defaultTheme="dark"
         // switchable
       >
         <TooltipProvider>
