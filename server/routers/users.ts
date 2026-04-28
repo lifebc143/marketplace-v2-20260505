@@ -1,12 +1,12 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../_core/trpc";
-import { getUserProfileByUserId, upsertUserProfile } from "../db";
+import { getUserProfile, updateUserProfile } from "../db";
 import { TRPCError } from "@trpc/server";
 
 export const usersRouter = router({
   // Get current user's profile
   me: protectedProcedure.query(async ({ ctx }) => {
-    const profile = await getUserProfileByUserId(ctx.user.id);
+    const profile = await getUserProfile(ctx.user.id);
     return {
       user: ctx.user,
       profile: profile || null,
@@ -24,11 +24,7 @@ export const usersRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       try {
-        await upsertUserProfile(ctx.user.id, {
-          bio: input.bio,
-          phone: input.phone,
-          address: input.address,
-        });
+        await updateUserProfile(ctx.user.id, input);
         return { success: true };
       } catch (error) {
         console.error("[Users] Update profile error:", error);
