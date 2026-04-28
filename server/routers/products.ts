@@ -94,7 +94,7 @@ export const productsRouter = router({
         images: z
           .array(
             z.object({
-              data: z.instanceof(Buffer),
+              data: z.any(), // Accept any array-like data (Uint8Array, Buffer, etc.)
               mimeType: z.string(),
               isAiGenerated: z.boolean().default(false),
             })
@@ -129,9 +129,12 @@ export const productsRouter = router({
           const image = input.images[i];
           const fileKey = `products/${product.id}/image-${i}-${Date.now()}`;
 
+          // Convert Uint8Array to Buffer for storage
+          const buffer = Buffer.from(image.data);
+
           const { url, key } = await storagePut(
             fileKey,
-            image.data,
+            buffer,
             image.mimeType
           );
 

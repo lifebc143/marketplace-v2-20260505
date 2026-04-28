@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Buffer } from "buffer";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
@@ -38,6 +37,7 @@ export default function CreateProduct() {
   });
 
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
+  const [imageError, setImageError] = useState<string | null>(null);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -127,8 +127,8 @@ export default function CreateProduct() {
     setIsSubmitting(true);
 
     try {
-      // Convert images to ArrayBuffer for submission
-      const imageData: Array<{ data: Buffer; mimeType: string }> = [];
+      // Convert images to Uint8Array for submission
+      const imageData: Array<{ data: Uint8Array; mimeType: string }> = [];
 
       for (const file of uploadedImages) {
         const arrayBuffer = await new Promise<ArrayBuffer>((resolve) => {
@@ -139,11 +139,11 @@ export default function CreateProduct() {
           reader.readAsArrayBuffer(file);
         });
 
-        // Convert ArrayBuffer to Buffer
-        const buffer = Buffer.from(arrayBuffer);
+        // Convert ArrayBuffer to Uint8Array
+        const uint8Array = new Uint8Array(arrayBuffer) as any;
 
         imageData.push({
-          data: buffer,
+          data: uint8Array,
           mimeType: file.type,
         });
       }
