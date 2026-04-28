@@ -4,6 +4,7 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import ProductList from "./pages/ProductList";
 import ProductDetail from "./pages/ProductDetail";
@@ -18,17 +19,21 @@ import AdminCategories from "./pages/AdminCategories";
 import Checkout from "./pages/Checkout";
 import Orders from "./pages/Orders";
 import Policy from "./pages/Policy";
+import Messages from "./pages/Messages";
 
 function Router() {
   // Route order matters: specific routes must come before dynamic ones
   // /products/create must come before /products/:id to avoid being matched as a product ID
   return (
-    <Switch>
+    <>
+      <Navbar />
+      <Switch>
       <Route path={"/"} component={Home} />
       <Route path={"/products"} component={ProductList} />
       <Route path={"/products/create"} component={CreateProduct} />
       <Route path={"/checkout"} component={Checkout} />
       <Route path={"/orders"} component={Orders} />
+      <Route path={"/messages"} component={Messages} />
       <Route path={"/policy"} component={Policy} />
       <Route path={"/products/:id"} component={ProductDetail} />
       <Route path={"/my-products"} component={MyProducts} />
@@ -41,7 +46,8 @@ function Router() {
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
-    </Switch>
+      </Switch>
+    </>
   );
 }
 

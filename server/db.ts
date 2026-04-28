@@ -1,6 +1,6 @@
 import { eq, like, or, and, desc, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, categories, userProfiles, products, productImages, InsertUserProfile, InsertProduct, InsertProductImage, orders, orderItems, InsertOrder, InsertOrderItem, reviews, InsertReview, Review } from "../drizzle/schema";
+import { InsertUser, users, categories, userProfiles, products, productImages, InsertUserProfile, InsertProduct, InsertProductImage, orders, orderItems, InsertOrder, InsertOrderItem, reviews, InsertReview, Review, conversations, InsertConversation, Conversation, messages, InsertMessage, Message, notifications, InsertNotification, Notification } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -584,4 +584,199 @@ export async function getReviewByOrderAndProduct(orderId: number, productId: num
     .limit(1);
   
   return result[0];
+}
+
+
+/**
+ * Conversation queries
+ */
+export async function getOrCreateConversation(
+  buyerId: number,
+  sellerId: number,
+  productId: number,
+  orderId?: number
+): Promise<number> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // 查找現有對話
+  const existing = await db
+    .select()
+    .from(conversations)
+    .where(
+      and(
+        eq(conversations.buyerId, buyerId),
+        eq(conversations.sellerId, sellerId),
+        eq(conversations.productId, productId)
+      )
+    )
+    .limit(1);
+
+  if (existing.length > 0) {
+    return existing[0].id;
+  }
+
+  // 創建新對話
+  const result = await db.insert(conversations).values({
+    buyerId,
+    sellerId,
+    productId,
+    orderId,
+  });
+
+  const insertId = (result as any)?.insertId ?? (result as any)?.[0]?.insertId;
+  if (!insertId) throw new Error("Failed to create conversation");
+  return insertId;
+}
+
+export async function getConversationById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(conversations).where(eq(conversations.id, id)).limit(1);
+  return result[0];
+}
+
+export async function getUserConversations(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db
+    .select()
+    .from(conversations)
+    .where(or(eq(conversations.buyerId, userId), eq(conversations.sellerId, userId)))
+    .orderBy(desc(conversations.lastMessageAt));
+}
+
+/**
+ * Message queries
+ */
+export async function sendMessage(data: InsertMessage): Promise<number> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(messages).values(data);
+  const insertId = (result as any)?.insertId ?? (result as any)?.[0]?.insertId;
+  if (!insertId) throw new Error("Failed to send message");
+
+  // 更新對話的 lastMessageAt
+  await db
+    .update(conversations)
+    .set({ lastMessageAt: new Date() })
+    .where(eq(conversations.id, data.conversationId));
+
+  return insertId;
+}
+
+export async function getConversationMessages(conversationId: number, limit: number = 50, offset: number = 0) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db
+    .select()
+    .from(messages)
+    .where(eq(messages.conversationId, conversationId))
+    .orderBy(desc(messages.createdAt))
+    .limit(limit)
+    .offset(offset);
+}
+
+export async function markMessagesAsRead(conversationId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(messages)
+    .set({ isRead: 1 })
+    .where(
+      and(
+        eq(messages.conversationId, conversationId),
+        // 只標記不是發送者的訊息為已讀
+        sql`${messages.senderId} != ${userId}`
+      )
+    );
+}
+
+export async function getUnreadMessageCount(conversationId: number, userId: number) {
+  const db = await getDb();
+  if (!db) return 0;
+
+  const result = await db
+    .select({ count: sql`COUNT(*)` })
+    .from(messages)
+    .where(
+      and(
+        eq(messages.conversationId, conversationId),
+        eq(messages.isRead, 0),
+        sql`${messages.senderId} != ${userId}`
+      )
+    );
+
+  return result[0]?.count ? parseInt(result[0].count as string) : 0;
+}
+
+
+/**
+ * Notification queries
+ */
+export async function createNotification(data: InsertNotification): Promise<number> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(notifications).values(data);
+  const insertId = (result as any)?.insertId ?? (result as any)?.[0]?.insertId;
+  if (!insertId) throw new Error("Failed to create notification");
+  return insertId;
+}
+
+export async function getUserNotifications(userId: number, limit: number = 20, offset: number = 0) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db
+    .select()
+    .from(notifications)
+    .where(eq(notifications.userId, userId))
+    .orderBy(desc(notifications.createdAt))
+    .limit(limit)
+    .offset(offset);
+}
+
+export async function getUnreadNotificationCount(userId: number) {
+  const db = await getDb();
+  if (!db) return 0;
+
+  const result = await db
+    .select({ count: sql`COUNT(*)` })
+    .from(notifications)
+    .where(and(eq(notifications.userId, userId), eq(notifications.isRead, 0)));
+
+  return result[0]?.count ? parseInt(result[0].count as string) : 0;
+}
+
+export async function markNotificationAsRead(notificationId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(notifications)
+    .set({ isRead: 1 })
+    .where(eq(notifications.id, notificationId));
+}
+
+export async function markAllNotificationsAsRead(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(notifications)
+    .set({ isRead: 1 })
+    .where(and(eq(notifications.userId, userId), eq(notifications.isRead, 0)));
+}
+
+export async function deleteNotification(notificationId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.delete(notifications).where(eq(notifications.id, notificationId));
 }

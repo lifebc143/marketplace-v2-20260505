@@ -36,6 +36,20 @@
       "when": 1777357254803,
       "tag": "0004_gray_iceman",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1777367363511,
+      "tag": "0005_magenta_madame_masque",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1777367827102,
+      "tag": "0006_dashing_red_hulk",
+      "breakpoints": true
     }
   ]
 }

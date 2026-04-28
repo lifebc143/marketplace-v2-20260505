@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Loader2, ShoppingBag, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { toast } from "sonner";
+import ChatBox from "@/components/ChatBox";
 
 export default function ProductDetail() {
   const params = useParams();

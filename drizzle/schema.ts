@@ -190,3 +190,56 @@ export const reviews = mysqlTable("reviews", {
 
 export type Review = typeof reviews.$inferSelect;
 export type InsertReview = typeof reviews.$inferInsert;
+
+
+/**
+ * Conversations Table
+ * Stores conversation threads between buyers and sellers
+ */
+export const conversations = mysqlTable("conversations", {
+  id: int("id").autoincrement().primaryKey(),
+  buyerId: int("buyerId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  sellerId: int("sellerId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  productId: int("productId").notNull().references(() => products.id, { onDelete: "cascade" }),
+  orderId: int("orderId").references(() => orders.id, { onDelete: "set null" }),
+  lastMessageAt: timestamp("lastMessageAt").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Conversation = typeof conversations.$inferSelect;
+export type InsertConversation = typeof conversations.$inferInsert;
+
+/**
+ * Messages Table
+ * Stores individual messages in conversations
+ */
+export const messages = mysqlTable("messages", {
+  id: int("id").autoincrement().primaryKey(),
+  conversationId: int("conversationId").notNull().references(() => conversations.id, { onDelete: "cascade" }),
+  senderId: int("senderId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  content: text("content").notNull(),
+  isRead: int("isRead").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Message = typeof messages.$inferSelect;
+export type InsertMessage = typeof messages.$inferInsert;
+
+
+/**
+ * Notifications Table
+ * Stores custom notifications for users
+ */
+export const notifications = mysqlTable("notifications", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  type: varchar("type", { length: 50 }).notNull(), // "order", "message", "review", "system"
+  title: varchar("title", { length: 255 }).notNull(),
+  content: text("content").notNull(),
+  relatedId: int("relatedId"), // orderId, conversationId, reviewId, etc.
+  isRead: int("isRead").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = typeof notifications.$inferInsert;
