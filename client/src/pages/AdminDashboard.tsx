@@ -33,7 +33,7 @@ export default function AdminDashboard() {
   }
 
   // Fetch admin data
-  const { data: stats, isLoading: statsLoading } = trpc.admin.stats.useQuery();
+  const { data: stats, isLoading: statsLoading, error: statsError } = trpc.admin.stats.useQuery();
 
   const { data: users, isLoading: usersLoading } = trpc.admin.users.useQuery({
     limit: 5,
@@ -76,6 +76,11 @@ export default function AdminDashboard() {
         ) : (
           <>
             {/* Statistics Cards */}
+            {statsError && (
+              <div className="mb-4 p-4 bg-red-500/10 border border-red-200/50 rounded-lg">
+                <p className="text-sm text-red-600">無法載入統計數據。請重新整理頁面。</p>
+              </div>
+            )}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
               {/* Total Users */}
               <Card className="p-4 bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-200/20">
