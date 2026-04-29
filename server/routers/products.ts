@@ -10,6 +10,7 @@ import {
   updateProduct,
   getProductImages,
   addProductImage,
+  incrementProductViews,
 } from "../db";
 import { storagePut } from "../storage";
 import { TRPCError } from "@trpc/server";
@@ -224,5 +225,19 @@ export const productsRouter = router({
 
       await updateProduct(input.id, { status: "sold" });
       return { success: true };
+    }),
+
+  // Increment product view count
+  incrementViews: publicProcedure
+    .input(z.object({ id: z.number().int().positive() }))
+    .mutation(async ({ input }) => {
+      try {
+        await incrementProductViews(input.id);
+        return { success: true };
+      } catch (error) {
+        console.error("[Products] Increment views error:", error);
+        // Don't throw - view count increment is not critical
+        return { success: false };
+      }
     }),
 });

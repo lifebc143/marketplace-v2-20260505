@@ -60,7 +60,7 @@ describe("messages router", () => {
     it("should create a new conversation", async () => {
       const { getOrCreateConversation: mockGetOrCreate, getProductById: mockGetProduct } = await import("../db");
       vi.mocked(mockGetProduct).mockResolvedValue(mockProduct as any);
-      vi.mocked(mockGetOrCreate).mockResolvedValue(1);
+      vi.mocked(mockGetOrCreate).mockResolvedValue(mockConversation as any);
 
       const ctx = createContext(1);
       const caller = appRouter.createCaller(ctx);
@@ -129,7 +129,7 @@ describe("messages router", () => {
     it("should send a message successfully", async () => {
       const { getConversationById: mockGetConv, sendMessage: mockSend } = await import("../db");
       vi.mocked(mockGetConv).mockResolvedValue(mockConversation as any);
-      vi.mocked(mockSend).mockResolvedValue(1);
+      vi.mocked(mockSend).mockResolvedValue({ id: 1, conversationId: 1, senderId: 1, content: "Hello seller", isRead: 0, createdAt: new Date() } as any);
 
       const ctx = createContext(1);
       const caller = appRouter.createCaller(ctx);
@@ -139,11 +139,11 @@ describe("messages router", () => {
       });
 
       expect(result).toEqual({ messageId: 1, success: true });
-      expect(mockSend).toHaveBeenCalledWith({
-        conversationId: 1,
-        senderId: 1,
-        content: "Hello seller",
-      });
+      expect(mockSend).toHaveBeenCalledWith(
+        1,
+        1,
+        "Hello seller"
+      );
     });
 
     it("should reject if user is not a participant", async () => {

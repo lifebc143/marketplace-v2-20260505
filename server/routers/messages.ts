@@ -64,12 +64,12 @@ export const messagesRouter = router({
           });
         }
 
-        const conversationId = await getOrCreateConversation(
+        const conversation = await getOrCreateConversation(
           ctx.user.id,
           input.sellerId,
-          input.productId,
-          input.orderId
+          input.productId
         );
+        const conversationId = conversation.id;
 
         return { conversationId };
       } catch (error) {
@@ -144,11 +144,7 @@ export const messagesRouter = router({
           });
         }
 
-        const messages = await getConversationMessages(
-          input.conversationId,
-          input.limit,
-          input.offset
-        );
+        const messages = await getConversationMessages(input.conversationId);
 
         return messages.reverse(); // 返回時間順序正確的訊息
       } catch (error) {
@@ -187,11 +183,12 @@ export const messagesRouter = router({
           });
         }
 
-        const messageId = await sendMessage({
-          conversationId: input.conversationId,
-          senderId: ctx.user.id,
-          content: input.content,
-        });
+        const message = await sendMessage(
+          input.conversationId,
+          ctx.user.id,
+          input.content
+        );
+        const messageId = message.id;
 
         return { messageId, success: true };
       } catch (error) {
@@ -225,7 +222,7 @@ export const messagesRouter = router({
           });
         }
 
-        const count = await getUnreadMessageCount(input.conversationId, ctx.user.id);
+        const count = await getUnreadMessageCount(ctx.user.id);
         return { count };
       } catch (error) {
         if (error instanceof TRPCError) throw error;

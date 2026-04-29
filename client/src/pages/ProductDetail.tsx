@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,16 @@ export default function ProductDetail() {
     { id: productId! },
     { enabled: !!productId }
   );
+
+  const incrementViewsMutation = trpc.products.incrementViews.useMutation();
+
+  // 遞增瀏覽次數
+  useEffect(() => {
+    if (productId && product) {
+      // 調用後端 API 遞增瀏覽次數
+      incrementViewsMutation.mutate({ id: productId });
+    }
+  }, [productId, product?.id, incrementViewsMutation]);
 
   if (!productId) {
     return (
@@ -183,7 +193,7 @@ export default function ProductDetail() {
                     {product.condition}
                   </span>
                   <span className="text-xs text-muted-foreground">
-                    {product.views} 次瀏覽
+                    {product?.views || 0} 次瀏覽
                   </span>
                 </div>
               </div>

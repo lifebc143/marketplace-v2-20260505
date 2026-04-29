@@ -41,7 +41,7 @@ describe("Orders Router", () => {
 
       // Mock the database functions
       (db.getProductById as any).mockResolvedValue(mockProduct);
-      (db.createOrder as any).mockResolvedValue(mockOrderId);
+      (db.createOrder as any).mockResolvedValue({ id: mockOrderId, status: "pending" });
       (db.addOrderItem as any).mockResolvedValue(1);
 
       const caller = ordersRouter.createCaller(mockContext);

@@ -1,4 +1,4 @@
-import { eq, like, or, and, desc, sql } from "drizzle-orm";
+import { eq, or, and, like, desc, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, users, categories, userProfiles, products, productImages, InsertUserProfile, InsertProduct, InsertProductImage, orders, orderItems, InsertOrder, InsertOrderItem, reviews, InsertReview, Review, conversations, InsertConversation, Conversation, messages, InsertMessage, Message, notifications, InsertNotification, Notification } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -99,81 +99,11 @@ export async function getAllCategories() {
     return [
       { id: 1, name: "電子產品", description: null, createdAt: new Date(), updatedAt: new Date() },
       { id: 2, name: "服飾", description: null, createdAt: new Date(), updatedAt: new Date() },
-      { id: 3, name: "家具", description: null, createdAt: new Date(), updatedAt: new Date() },
-      { id: 4, name: "交通工具", description: null, createdAt: new Date(), updatedAt: new Date() },
-      { id: 5, name: "書籍", description: null, createdAt: new Date(), updatedAt: new Date() },
-      { id: 6, name: "運動器材", description: null, createdAt: new Date(), updatedAt: new Date() },
-      { id: 7, name: "美妝", description: null, createdAt: new Date(), updatedAt: new Date() },
-      { id: 8, name: "玩具", description: null, createdAt: new Date(), updatedAt: new Date() },
-      { id: 9, name: "其他", description: null, createdAt: new Date(), updatedAt: new Date() },
+      { id: 3, name: "家居", description: null, createdAt: new Date(), updatedAt: new Date() },
     ];
   }
 
-  try {
-    return await db.select().from(categories);
-  } catch {
-    // Return hardcoded categories as fallback
-    return [
-      { id: 1, name: "電子產品", description: null, createdAt: new Date(), updatedAt: new Date() },
-      { id: 2, name: "服飾", description: null, createdAt: new Date(), updatedAt: new Date() },
-      { id: 3, name: "家具", description: null, createdAt: new Date(), updatedAt: new Date() },
-      { id: 4, name: "交通工具", description: null, createdAt: new Date(), updatedAt: new Date() },
-      { id: 5, name: "書籍", description: null, createdAt: new Date(), updatedAt: new Date() },
-      { id: 6, name: "運動器材", description: null, createdAt: new Date(), updatedAt: new Date() },
-      { id: 7, name: "美妝", description: null, createdAt: new Date(), updatedAt: new Date() },
-      { id: 8, name: "玩具", description: null, createdAt: new Date(), updatedAt: new Date() },
-      { id: 9, name: "其他", description: null, createdAt: new Date(), updatedAt: new Date() },
-    ];
-  }
-}
-
-export async function createCategory(name: string, description?: string | null) {
-  const db = await getDb();
-  if (!db) throw new Error('Database not available');
-  
-  // Generate slug from name
-  const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-  
-  const result = await db.insert(categories).values({
-    name,
-    slug,
-    description: description || null,
-  });
-  
-  const insertedId = (result as any)?.insertId;
-  if (!insertedId) {
-    const inserted = await db.select().from(categories)
-      .where(eq(categories.name, name))
-      .limit(1);
-    return inserted[0];
-  }
-  
-  const category = await db.select().from(categories)
-    .where(eq(categories.id, insertedId))
-    .limit(1);
-  return category[0];
-}
-
-export async function updateCategory(id: number, name?: string, description?: string | null) {
-  const db = await getDb();
-  if (!db) throw new Error('Database not available');
-  
-  const updateData: any = {};
-  if (name !== undefined) {
-    updateData.name = name;
-    // Generate slug from name
-    updateData.slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-  }
-  if (description !== undefined) updateData.description = description;
-  
-  await db.update(categories).set(updateData).where(eq(categories.id, id));
-}
-
-export async function deleteCategory(id: number) {
-  const db = await getDb();
-  if (!db) throw new Error('Database not available');
-  
-  await db.delete(categories).where(eq(categories.id, id));
+  return db.select().from(categories);
 }
 
 /**
@@ -182,12 +112,14 @@ export async function deleteCategory(id: number) {
 export async function getActiveProducts(limit: number = 20, offset: number = 0) {
   const db = await getDb();
   if (!db) return [];
-  
-  const productList = await db.select().from(products)
+
+  const productList = await db
+    .select()
+    .from(products)
     .where(eq(products.status, 'active'))
     .limit(limit)
     .offset(offset);
-  
+
   // Get images for each product
   const productsWithImages = await Promise.all(
     productList.map(async (product) => {
@@ -195,7 +127,7 @@ export async function getActiveProducts(limit: number = 20, offset: number = 0) 
       return { ...product, images };
     })
   );
-  
+
   return productsWithImages;
 }
 
@@ -300,21 +232,416 @@ export async function updateProduct(productId: number, data: Partial<InsertProdu
 }
 
 /**
+ * Increment product view count
+ */
+export async function incrementProductViews(productId: number) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  
+  try {
+    await db.update(products)
+      .set({ views: sql`views + 1` })
+      .where(eq(products.id, productId));
+  } catch (error) {
+    console.error('[DB] incrementProductViews error:', error);
+    // Don't throw - view count increment is not critical
+  }
+}
+
+/**
  * Product Image queries
  */
 export async function getProductImages(productId: number) {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(productImages)
-    .where(eq(productImages.productId, productId))
-    .orderBy(productImages.displayOrder);
+
+  return db.select().from(productImages).where(eq(productImages.productId, productId)).orderBy(productImages.displayOrder);
 }
 
 export async function addProductImage(data: InsertProductImage) {
   const db = await getDb();
   if (!db) throw new Error('Database not available');
-  await db.insert(productImages).values(data);
-  return { success: true };
+
+  return db.insert(productImages).values(data);
+}
+
+/**
+ * Order queries
+ */
+export async function createOrder(data: InsertOrder) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  try {
+    const result = await db.insert(orders).values(data);
+    const insertedId = (result as any)?.insertId || (result as any)?.[0]?.id;
+
+    if (!insertedId) {
+      const inserted = await db.select().from(orders)
+        .where(eq(orders.buyerId, data.buyerId))
+        .orderBy(desc(orders.createdAt))
+        .limit(1);
+
+      if (inserted.length === 0) {
+        throw new Error('Failed to retrieve inserted order');
+      }
+      return inserted[0];
+    }
+
+    const order = await db.select().from(orders)
+      .where(eq(orders.id, insertedId))
+      .limit(1);
+
+    if (order.length === 0) {
+      throw new Error('Failed to retrieve inserted order');
+    }
+
+    return order[0];
+  } catch (error) {
+    console.error('[DB] createOrder error:', error);
+    throw error;
+  }
+}
+
+export async function getOrderById(orderId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const order = await db.select().from(orders).where(eq(orders.id, orderId)).limit(1);
+  return order[0];
+}
+
+export async function getOrdersByBuyerId(buyerId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db.select().from(orders).where(eq(orders.buyerId, buyerId));
+}
+
+export async function getOrdersBySellerId(sellerId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db.select().from(orders).where(eq(orders.sellerId, sellerId));
+}
+
+export async function updateOrderStatus(orderId: number, status: string) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  await db.update(orders).set({ status: status as any }).where(eq(orders.id, orderId));
+}
+
+/**
+ * Order Item queries
+ */
+export async function addOrderItem(data: InsertOrderItem) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  try {
+    const result = await db.insert(orderItems).values(data);
+    const insertedId = (result as any)?.insertId || (result as any)?.[0]?.id;
+
+    if (!insertedId) {
+      const inserted = await db.select().from(orderItems)
+        .where(eq(orderItems.orderId, data.orderId))
+        .orderBy(desc(orderItems.createdAt))
+        .limit(1);
+
+      if (inserted.length === 0) {
+        throw new Error('Failed to retrieve inserted order item');
+      }
+      return inserted[0];
+    }
+
+    const item = await db.select().from(orderItems)
+      .where(eq(orderItems.id, insertedId))
+      .limit(1);
+
+    if (item.length === 0) {
+      throw new Error('Failed to retrieve inserted order item');
+    }
+
+    return item[0];
+  } catch (error) {
+    console.error('[DB] addOrderItem error:', error);
+    throw error;
+  }
+}
+
+export async function getOrderItems(orderId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db.select().from(orderItems).where(eq(orderItems.orderId, orderId));
+}
+
+/**
+ * Review queries
+ */
+export async function createReview(data: InsertReview) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  try {
+    const result = await db.insert(reviews).values(data);
+    const insertedId = (result as any)?.insertId || (result as any)?.[0]?.id;
+
+    if (!insertedId) {
+      const inserted = await db.select().from(reviews)
+        .where(eq(reviews.buyerId, data.buyerId))
+        .orderBy(desc(reviews.createdAt))
+        .limit(1);
+
+      if (inserted.length === 0) {
+        throw new Error('Failed to retrieve inserted review');
+      }
+      return inserted[0];
+    }
+
+    const review = await db.select().from(reviews)
+      .where(eq(reviews.id, insertedId))
+      .limit(1);
+
+    if (review.length === 0) {
+      throw new Error('Failed to retrieve inserted review');
+    }
+
+    return review[0];
+  } catch (error) {
+    console.error('[DB] createReview error:', error);
+    throw error;
+  }
+}
+
+export async function getReviewsByProductId(productId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db.select().from(reviews).where(eq(reviews.productId, productId));
+}
+
+export async function getReviewById(reviewId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const review = await db.select().from(reviews).where(eq(reviews.id, reviewId)).limit(1);
+  return review[0];
+}
+
+export async function updateReview(reviewId: number, data: Partial<InsertReview>) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  await db.update(reviews).set(data).where(eq(reviews.id, reviewId));
+}
+
+export async function deleteReview(reviewId: number) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  await db.delete(reviews).where(eq(reviews.id, reviewId));
+}
+
+export async function getAverageRating(productId: number) {
+  const db = await getDb();
+  if (!db) return 0;
+
+  const result = await db.select({
+    avgRating: sql<number>`AVG(rating)`
+  }).from(reviews).where(eq(reviews.productId, productId));
+
+  return result[0]?.avgRating || 0;
+}
+
+/**
+ * Conversation queries
+ */
+export async function createConversation(data: InsertConversation) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  try {
+    // Check if conversation already exists
+    const existing = await db.select().from(conversations)
+      .where(
+        and(
+          eq(conversations.buyerId, data.buyerId),
+          eq(conversations.sellerId, data.sellerId),
+          eq(conversations.productId, data.productId)
+        )
+      )
+      .limit(1);
+
+    if (existing.length > 0) {
+      return existing[0];
+    }
+
+    const result = await db.insert(conversations).values(data);
+    const insertedId = (result as any)?.insertId || (result as any)?.[0]?.id;
+
+    if (!insertedId) {
+      const inserted = await db.select().from(conversations)
+        .where(
+          and(
+            eq(conversations.buyerId, data.buyerId),
+            eq(conversations.sellerId, data.sellerId),
+            eq(conversations.productId, data.productId)
+          )
+        )
+        .limit(1);
+
+      if (inserted.length === 0) {
+        throw new Error('Failed to retrieve inserted conversation');
+      }
+      return inserted[0];
+    }
+
+    const conversation = await db.select().from(conversations)
+      .where(eq(conversations.id, insertedId))
+      .limit(1);
+
+    if (conversation.length === 0) {
+      throw new Error('Failed to retrieve inserted conversation');
+    }
+
+    return conversation[0];
+  } catch (error) {
+    console.error('[DB] createConversation error:', error);
+    throw error;
+  }
+}
+
+export async function getConversationById(conversationId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const conversation = await db.select().from(conversations).where(eq(conversations.id, conversationId)).limit(1);
+  return conversation[0];
+}
+
+export async function getConversationsByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db.select().from(conversations)
+    .where(
+      or(
+        eq(conversations.buyerId, userId),
+        eq(conversations.sellerId, userId)
+      )
+    );
+}
+
+/**
+ * Message queries
+ */
+export async function createMessage(data: InsertMessage) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  try {
+    const result = await db.insert(messages).values(data);
+    const insertedId = (result as any)?.insertId || (result as any)?.[0]?.id;
+
+    if (!insertedId) {
+      const inserted = await db.select().from(messages)
+        .where(eq(messages.conversationId, data.conversationId))
+        .orderBy(desc(messages.createdAt))
+        .limit(1);
+
+      if (inserted.length === 0) {
+        throw new Error('Failed to retrieve inserted message');
+      }
+      return inserted[0];
+    }
+
+    const message = await db.select().from(messages)
+      .where(eq(messages.id, insertedId))
+      .limit(1);
+
+    if (message.length === 0) {
+      throw new Error('Failed to retrieve inserted message');
+    }
+
+    return message[0];
+  } catch (error) {
+    console.error('[DB] createMessage error:', error);
+    throw error;
+  }
+}
+
+export async function getMessagesByConversationId(conversationId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db.select().from(messages).where(eq(messages.conversationId, conversationId));
+}
+
+export async function markMessagesAsRead(conversationId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  await db.update(messages)
+    .set({ isRead: 1 })
+    .where(
+      and(
+        eq(messages.conversationId, conversationId)
+      )
+    );
+}
+
+/**
+ * Notification queries
+ */
+export async function createNotification(data: InsertNotification) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  try {
+    const result = await db.insert(notifications).values(data);
+    const insertedId = (result as any)?.insertId || (result as any)?.[0]?.id;
+
+    if (!insertedId) {
+      const inserted = await db.select().from(notifications)
+        .where(eq(notifications.userId, data.userId))
+        .orderBy(desc(notifications.createdAt))
+        .limit(1);
+
+      if (inserted.length === 0) {
+        throw new Error('Failed to retrieve inserted notification');
+      }
+      return inserted[0];
+    }
+
+    const notification = await db.select().from(notifications)
+      .where(eq(notifications.id, insertedId))
+      .limit(1);
+
+    if (notification.length === 0) {
+      throw new Error('Failed to retrieve inserted notification');
+    }
+
+    return notification[0];
+  } catch (error) {
+    console.error('[DB] createNotification error:', error);
+    throw error;
+  }
+}
+
+export async function getNotificationsByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db.select().from(notifications).where(eq(notifications.userId, userId));
+}
+
+export async function markNotificationAsRead(notificationId: number) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  await db.update(notifications).set({ isRead: 1 }).where(eq(notifications.id, notificationId));
 }
 
 /**
@@ -323,451 +650,26 @@ export async function addProductImage(data: InsertProductImage) {
 export async function getUserProfile(userId: number) {
   const db = await getDb();
   if (!db) return undefined;
-  
-  const result = await db.select().from(userProfiles).where(eq(userProfiles.userId, userId)).limit(1);
-  return result[0];
+
+  const profile = await db.select().from(userProfiles).where(eq(userProfiles.userId, userId)).limit(1);
+  return profile[0];
 }
 
 export async function updateUserProfile(userId: number, data: Partial<InsertUserProfile>) {
   const db = await getDb();
   if (!db) throw new Error('Database not available');
-  
-  const existing = await getUserProfile(userId);
-  if (existing) {
-    await db.update(userProfiles).set(data).where(eq(userProfiles.userId, userId));
-  } else {
-    await db.insert(userProfiles).values({ userId, ...data });
-  }
+
+  await db.update(userProfiles).set(data).where(eq(userProfiles.userId, userId));
 }
 
 /**
- * Admin queries
+ * Additional notification queries
  */
-export async function getAllUsers(limit: number = 20, offset: number = 0) {
-  const db = await getDb();
-  if (!db) return [];
-  
-  return db.select().from(users).limit(limit).offset(offset);
-}
-
-export async function getPendingProducts(limit: number = 20, offset: number = 0) {
-  const db = await getDb();
-  if (!db) return [];
-  
-  return db.select().from(products)
-    .where(eq(products.status, 'pending_review'))
-    .limit(limit)
-    .offset(offset);
-}
-
-export async function getStats() {
-  const db = await getDb();
-  if (!db) {
-    return {
-      totalUsers: 0,
-      activeProducts: 0,
-      pendingReviewProducts: 0,
-      totalCategories: 9,
-    };
-  }
-  
-  try {
-    // Get total users count
-    const userCount = await db.select().from(users);
-    const totalUsers = userCount.length;
-    
-    // Get active products count
-    const activeCount = await db.select().from(products)
-      .where(eq(products.status, 'active'));
-    const activeProducts = activeCount.length;
-    
-    // Get pending products count
-    const pendingCount = await db.select().from(products)
-      .where(eq(products.status, 'pending_review'));
-    const pendingReviewProducts = pendingCount.length;
-    
-    // Get total categories count
-    const categoryCount = await db.select().from(categories);
-    const totalCategories = categoryCount.length;
-    
-    return {
-      totalUsers,
-      activeProducts,
-      pendingReviewProducts,
-      totalCategories,
-    };
-  } catch (error) {
-    console.error('[DB] getStats error:', error);
-    return {
-      totalUsers: 0,
-      activeProducts: 0,
-      pendingReviewProducts: 0,
-      totalCategories: 9,
-    };
-  }
-}
-
-export async function disableUser(userId: number) {
-  const db = await getDb();
-  if (!db) throw new Error('Database not available');
-  
-  // Update user role to 'disabled' or delete
-  await db.update(users).set({ role: 'user' as any }).where(eq(users.id, userId));
-}
-
-export async function deleteUser(userId: number) {
-  const db = await getDb();
-  if (!db) throw new Error('Database not available');
-  
-  await db.delete(users).where(eq(users.id, userId));
-}
-
-export async function approveProduct(productId: number) {
-  const db = await getDb();
-  if (!db) throw new Error('Database not available');
-  
-  await db.update(products).set({ status: 'active' }).where(eq(products.id, productId));
-}
-
-export async function rejectProduct(productId: number) {
-  const db = await getDb();
-  if (!db) throw new Error('Database not available');
-  
-  await db.update(products).set({ status: 'removed' }).where(eq(products.id, productId));
-}
-
-export async function deleteProduct(productId: number) {
-  const db = await getDb();
-  if (!db) throw new Error('Database not available');
-  
-  await db.delete(products).where(eq(products.id, productId));
-}
-
-
-// ===== Orders =====
-
-export async function createOrder(data: InsertOrder): Promise<number> {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  
-  try {
-    const result = await db.insert(orders).values(data);
-    // TiDB/MySQL2 返回格式：result.insertId 或 result[0].insertId
-    let insertId = (result as any)?.insertId;
-    if (!insertId && Array.isArray(result)) {
-      insertId = (result as any)[0]?.insertId;
-    }
-    if (!insertId) {
-      console.error('createOrder result structure:', result);
-      throw new Error('Failed to create order: no insertId returned');
-    }
-    return insertId;
-  } catch (error) {
-    console.error('createOrder error:', {
-      error: error instanceof Error ? error.message : String(error),
-      sqlMessage: (error as any)?.sqlMessage,
-      code: (error as any)?.code,
-    });
-    throw error;
-  }
-}
-
-export async function getOrderById(id: number) {
-  const db = await getDb();
-  if (!db) return undefined;
-  
-  const result = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
-  return result.length > 0 ? result[0] : undefined;
-}
-
-export async function getOrdersByBuyerId(buyerId: number) {
-  const db = await getDb();
-  if (!db) return [];
-  
-  return await db.select().from(orders).where(eq(orders.buyerId, buyerId));
-}
-
-export async function getOrdersBySellerId(sellerId: number) {
-  const db = await getDb();
-  if (!db) return [];
-  
-  return await db.select().from(orders).where(eq(orders.sellerId, sellerId));
-}
-
-export async function updateOrderStatus(id: number, status: string) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  
-  await db.update(orders).set({ status: status as any }).where(eq(orders.id, id));
-}
-
-// ===== Order Items =====
-
-export async function addOrderItem(data: InsertOrderItem): Promise<number> {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  
-  try {
-    const result = await db.insert(orderItems).values(data);
-    // TiDB/MySQL2 返回格式：result.insertId 或 result[0].insertId
-    let insertId = (result as any)?.insertId;
-    if (!insertId && Array.isArray(result)) {
-      insertId = (result as any)[0]?.insertId;
-    }
-    if (!insertId) {
-      console.error('addOrderItem result structure:', result);
-      throw new Error('Failed to add order item: no insertId returned');
-    }
-    return insertId;
-  } catch (error) {
-    console.error('addOrderItem error:', {
-      error: error instanceof Error ? error.message : String(error),
-      sqlMessage: (error as any)?.sqlMessage,
-      code: (error as any)?.code,
-    });
-    throw error;
-  }
-}
-
-export async function getOrderItems(orderId: number) {
-  const db = await getDb();
-  if (!db) return [];
-  
-  return await db.select().from(orderItems).where(eq(orderItems.orderId, orderId));
-}
-
-
-/**
- * Review queries
- */
-export async function getReviewsByProductId(productId: number, limit: number = 10, offset: number = 0) {
-  const db = await getDb();
-  if (!db) return [];
-  
-  return db
-    .select()
-    .from(reviews)
-    .where(eq(reviews.productId, productId))
-    .orderBy(desc(reviews.createdAt))
-    .limit(limit)
-    .offset(offset);
-}
-
-export async function getReviewById(id: number) {
-  const db = await getDb();
-  if (!db) return undefined;
-  
-  const result = await db.select().from(reviews).where(eq(reviews.id, id)).limit(1);
-  return result[0];
-}
-
-export async function createReview(data: InsertReview) {
-  const db = await getDb();
-  if (!db) throw new Error('Database not available');
-  
-  const result = await db.insert(reviews).values(data);
-  return result;
-}
-
-export async function updateReview(id: number, data: Partial<InsertReview>) {
-  const db = await getDb();
-  if (!db) throw new Error('Database not available');
-  
-  await db.update(reviews).set(data).where(eq(reviews.id, id));
-}
-
-export async function deleteReview(id: number) {
-  const db = await getDb();
-  if (!db) throw new Error('Database not available');
-  
-  await db.delete(reviews).where(eq(reviews.id, id));
-}
-
-export async function getAverageRating(productId: number) {
-  const db = await getDb();
-  if (!db) return 0;
-  
-  const result = await db.select({
-    avgRating: sql`AVG(${reviews.rating})`
-  }).from(reviews).where(eq(reviews.productId, productId));
-  
-  return result[0]?.avgRating ? parseFloat(result[0].avgRating as string) : 0;
-}
-
-export async function getReviewCount(productId: number) {
-  const db = await getDb();
-  if (!db) return 0;
-  
-  const result = await db.select({
-    count: sql`COUNT(*)`
-  }).from(reviews).where(eq(reviews.productId, productId));
-  
-  return result[0]?.count ? parseInt(result[0].count as string) : 0;
-}
-
-export async function getReviewByOrderAndProduct(orderId: number, productId: number) {
-  const db = await getDb();
-  if (!db) return undefined;
-  
-  const result = await db
-    .select()
-    .from(reviews)
-    .where(and(eq(reviews.orderId, orderId), eq(reviews.productId, productId)))
-    .limit(1);
-  
-  return result[0];
-}
-
-
-/**
- * Conversation queries
- */
-export async function getOrCreateConversation(
-  buyerId: number,
-  sellerId: number,
-  productId: number,
-  orderId?: number
-): Promise<number> {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-
-  // 查找現有對話
-  const existing = await db
-    .select()
-    .from(conversations)
-    .where(
-      and(
-        eq(conversations.buyerId, buyerId),
-        eq(conversations.sellerId, sellerId),
-        eq(conversations.productId, productId)
-      )
-    )
-    .limit(1);
-
-  if (existing.length > 0) {
-    return existing[0].id;
-  }
-
-  // 創建新對話
-  const result = await db.insert(conversations).values({
-    buyerId,
-    sellerId,
-    productId,
-    orderId,
-  });
-
-  const insertId = (result as any)?.insertId ?? (result as any)?.[0]?.insertId;
-  if (!insertId) throw new Error("Failed to create conversation");
-  return insertId;
-}
-
-export async function getConversationById(id: number) {
-  const db = await getDb();
-  if (!db) return undefined;
-
-  const result = await db.select().from(conversations).where(eq(conversations.id, id)).limit(1);
-  return result[0];
-}
-
-export async function getUserConversations(userId: number) {
-  const db = await getDb();
-  if (!db) return [];
-
-  return db
-    .select()
-    .from(conversations)
-    .where(or(eq(conversations.buyerId, userId), eq(conversations.sellerId, userId)))
-    .orderBy(desc(conversations.lastMessageAt));
-}
-
-/**
- * Message queries
- */
-export async function sendMessage(data: InsertMessage): Promise<number> {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-
-  const result = await db.insert(messages).values(data);
-  const insertId = (result as any)?.insertId ?? (result as any)?.[0]?.insertId;
-  if (!insertId) throw new Error("Failed to send message");
-
-  // 更新對話的 lastMessageAt
-  await db
-    .update(conversations)
-    .set({ lastMessageAt: new Date() })
-    .where(eq(conversations.id, data.conversationId));
-
-  return insertId;
-}
-
-export async function getConversationMessages(conversationId: number, limit: number = 50, offset: number = 0) {
-  const db = await getDb();
-  if (!db) return [];
-
-  return db
-    .select()
-    .from(messages)
-    .where(eq(messages.conversationId, conversationId))
-    .orderBy(desc(messages.createdAt))
-    .limit(limit)
-    .offset(offset);
-}
-
-export async function markMessagesAsRead(conversationId: number, userId: number) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-
-  await db
-    .update(messages)
-    .set({ isRead: 1 })
-    .where(
-      and(
-        eq(messages.conversationId, conversationId),
-        // 只標記不是發送者的訊息為已讀
-        sql`${messages.senderId} != ${userId}`
-      )
-    );
-}
-
-export async function getUnreadMessageCount(conversationId: number, userId: number) {
-  const db = await getDb();
-  if (!db) return 0;
-
-  const result = await db
-    .select({ count: sql`COUNT(*)` })
-    .from(messages)
-    .where(
-      and(
-        eq(messages.conversationId, conversationId),
-        eq(messages.isRead, 0),
-        sql`${messages.senderId} != ${userId}`
-      )
-    );
-
-  return result[0]?.count ? parseInt(result[0].count as string) : 0;
-}
-
-
-/**
- * Notification queries
- */
-export async function createNotification(data: InsertNotification): Promise<number> {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-
-  const result = await db.insert(notifications).values(data);
-  const insertId = (result as any)?.insertId ?? (result as any)?.[0]?.insertId;
-  if (!insertId) throw new Error("Failed to create notification");
-  return insertId;
-}
-
 export async function getUserNotifications(userId: number, limit: number = 20, offset: number = 0) {
   const db = await getDb();
   if (!db) return [];
 
-  return db
-    .select()
-    .from(notifications)
+  return db.select().from(notifications)
     .where(eq(notifications.userId, userId))
     .orderBy(desc(notifications.createdAt))
     .limit(limit)
@@ -778,37 +680,80 @@ export async function getUnreadNotificationCount(userId: number) {
   const db = await getDb();
   if (!db) return 0;
 
-  const result = await db
-    .select({ count: sql`COUNT(*)` })
-    .from(notifications)
-    .where(and(eq(notifications.userId, userId), eq(notifications.isRead, 0)));
+  const result = await db.select({
+    count: sql<number>`COUNT(*)`
+  }).from(notifications)
+    .where(
+      and(
+        eq(notifications.userId, userId),
+        eq(notifications.isRead, 0)
+      )
+    );
 
-  return result[0]?.count ? parseInt(result[0].count as string) : 0;
-}
-
-export async function markNotificationAsRead(notificationId: number) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-
-  await db
-    .update(notifications)
-    .set({ isRead: 1 })
-    .where(eq(notifications.id, notificationId));
+  return result[0]?.count || 0;
 }
 
 export async function markAllNotificationsAsRead(userId: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error('Database not available');
 
-  await db
-    .update(notifications)
+  await db.update(notifications)
     .set({ isRead: 1 })
-    .where(and(eq(notifications.userId, userId), eq(notifications.isRead, 0)));
+    .where(eq(notifications.userId, userId));
 }
 
 export async function deleteNotification(notificationId: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error('Database not available');
 
   await db.delete(notifications).where(eq(notifications.id, notificationId));
+}
+
+/**
+ * Additional message queries
+ */
+export async function getOrCreateConversation(buyerId: number, sellerId: number, productId: number) {
+  // This is already handled by createConversation
+  return createConversation({ buyerId, sellerId, productId });
+}
+
+export async function getUserConversations(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db.select().from(conversations)
+    .where(
+      or(
+        eq(conversations.buyerId, userId),
+        eq(conversations.sellerId, userId)
+      )
+    )
+    .orderBy(desc(conversations.lastMessageAt));
+}
+
+export async function sendMessage(conversationId: number, senderId: number, content: string) {
+  return createMessage({
+    conversationId,
+    senderId,
+    content,
+    isRead: 0,
+  });
+}
+
+export async function getConversationMessages(conversationId: number) {
+  return getMessagesByConversationId(conversationId);
+}
+
+export async function getUnreadMessageCount(userId: number) {
+  const db = await getDb();
+  if (!db) return 0;
+
+  const result = await db.select({
+    count: sql<number>`COUNT(*)`
+  }).from(messages)
+    .where(
+      eq(messages.isRead, 0)
+    );
+
+  return result[0]?.count || 0;
 }

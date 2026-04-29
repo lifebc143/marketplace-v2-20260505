@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { protectedProcedure, publicProcedure, router } from "../_core/trpc";
-import { getReviewsByProductId, getReviewById, createReview, updateReview, deleteReview, getAverageRating, getReviewCount, getOrderById, getOrderItems } from "../db";
+import { getReviewsByProductId, getReviewById, createReview, updateReview, deleteReview, getAverageRating, getOrderById, getOrderItems } from "../db";
 import { TRPCError } from "@trpc/server";
 
 export const reviewsRouter = router({
@@ -9,9 +9,9 @@ export const reviewsRouter = router({
     .input(z.object({ productId: z.number(), limit: z.number().default(10), offset: z.number().default(0) }))
     .query(async ({ input }) => {
       try {
-        const reviewList = await getReviewsByProductId(input.productId, input.limit, input.offset);
+        const reviewList = await getReviewsByProductId(input.productId);
         const avgRating = await getAverageRating(input.productId);
-        const count = await getReviewCount(input.productId);
+        const count = reviewList.length;
 
         return {
           reviews: reviewList,
@@ -79,7 +79,7 @@ export const reviewsRouter = router({
 
         // 檢查是否已評論
         const existingReviews = await getReviewsByProductId(input.productId);
-        const alreadyReviewed = existingReviews.some(r => r.buyerId === ctx.user.id && r.orderId === input.orderId);
+        const alreadyReviewed = existingReviews.some((r: any) => r.buyerId === ctx.user.id && r.orderId === input.orderId);
         if (alreadyReviewed) {
           throw new TRPCError({
             code: "BAD_REQUEST",

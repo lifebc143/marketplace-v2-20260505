@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../_core/trpc";
 import { and, or, eq } from "drizzle-orm";
-import { createOrder, addOrderItem, getOrdersByBuyerId, getOrderById, getProductById, updateOrderStatus, getUserProfile, getDb } from "../db";
+import { createOrder, addOrderItem, getOrdersByBuyerId, getOrderById, getProductById, updateOrderStatus, getDb, getUserProfile } from "../db";
 import { conversations, messages } from "../../drizzle/schema";
 import { TRPCError } from "@trpc/server";
 import { notifyOwner } from "../_core/notification";
@@ -50,7 +50,7 @@ export const ordersRouter = router({
         const totalAmount = product.price * input.quantity;
 
         // 創建訂單
-        const orderId = await createOrder({
+        const order = await createOrder({
           buyerId: ctx.user.id,
           sellerId: product.userId,
           status: "pending",
@@ -60,6 +60,8 @@ export const ordersRouter = router({
           recipientAddress: input.recipientAddress,
           notes: input.notes || null,
         });
+
+        const orderId = order.id;
 
         // 添加訂單項目
         await addOrderItem({
