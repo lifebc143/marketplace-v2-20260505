@@ -65,8 +65,8 @@ export const productsRouter = router({
         });
       }
 
-      const images = await getProductImages(product.id);
-      return { ...product, images };
+      // getProductById 已經包含 images，直接返回
+      return product;
     }),
 
   // Get user's products

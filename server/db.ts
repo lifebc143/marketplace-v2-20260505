@@ -450,10 +450,26 @@ export async function createOrder(data: InsertOrder): Promise<number> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  const result = await db.insert(orders).values(data);
-  const insertId = (result as any)?.insertId ?? (result as any)?.[0]?.insertId;
-  if (!insertId) throw new Error('Failed to create order: no insertId returned');
-  return insertId;
+  try {
+    const result = await db.insert(orders).values(data);
+    // TiDB/MySQL2 返回格式：result.insertId 或 result[0].insertId
+    let insertId = (result as any)?.insertId;
+    if (!insertId && Array.isArray(result)) {
+      insertId = (result as any)[0]?.insertId;
+    }
+    if (!insertId) {
+      console.error('createOrder result structure:', result);
+      throw new Error('Failed to create order: no insertId returned');
+    }
+    return insertId;
+  } catch (error) {
+    console.error('createOrder error:', {
+      error: error instanceof Error ? error.message : String(error),
+      sqlMessage: (error as any)?.sqlMessage,
+      code: (error as any)?.code,
+    });
+    throw error;
+  }
 }
 
 export async function getOrderById(id: number) {
@@ -491,10 +507,26 @@ export async function addOrderItem(data: InsertOrderItem): Promise<number> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  const result = await db.insert(orderItems).values(data);
-  const insertId = (result as any)?.insertId ?? (result as any)?.[0]?.insertId;
-  if (!insertId) throw new Error('Failed to add order item: no insertId returned');
-  return insertId;
+  try {
+    const result = await db.insert(orderItems).values(data);
+    // TiDB/MySQL2 返回格式：result.insertId 或 result[0].insertId
+    let insertId = (result as any)?.insertId;
+    if (!insertId && Array.isArray(result)) {
+      insertId = (result as any)[0]?.insertId;
+    }
+    if (!insertId) {
+      console.error('addOrderItem result structure:', result);
+      throw new Error('Failed to add order item: no insertId returned');
+    }
+    return insertId;
+  } catch (error) {
+    console.error('addOrderItem error:', {
+      error: error instanceof Error ? error.message : String(error),
+      sqlMessage: (error as any)?.sqlMessage,
+      code: (error as any)?.code,
+    });
+    throw error;
+  }
 }
 
 export async function getOrderItems(orderId: number) {

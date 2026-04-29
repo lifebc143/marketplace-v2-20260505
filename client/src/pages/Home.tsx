@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
@@ -16,9 +16,11 @@ export default function Home() {
   const { data: categories, isLoading: categoriesLoading } =
     trpc.products.categories.useQuery();
 
-  // Fetch featured products
+  // Fetch products based on selected category
   const { data: products, isLoading: productsLoading } =
-    trpc.products.list.useQuery({
+    trpc.products.search.useQuery({
+      query: "",
+      categoryId: selectedCategory,
       limit: 20,
       offset: 0,
     });

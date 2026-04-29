@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../_core/trpc";
-import { createOrder, addOrderItem, getOrdersByBuyerId, getOrderById, getProductById, updateOrderStatus, getUserProfile } from "../db";
+import { and, or, eq } from "drizzle-orm";
+import { createOrder, addOrderItem, getOrdersByBuyerId, getOrderById, getProductById, updateOrderStatus, getUserProfile, getDb } from "../db";
+import { conversations, messages } from "../../drizzle/schema";
 import { TRPCError } from "@trpc/server";
 import { notifyOwner } from "../_core/notification";
 
@@ -196,14 +198,46 @@ export const ordersRouter = router({
           });
         }
 
-        // 向賣家發送通知
+        // 向賣家發送訊息（創建訊息或通知）
         try {
-          await notifyOwner({
-            title: `新的訂單聯絡 - 訂單 #${order.id}`,
-            content: `買家想聯絡你。\n訂單編號: #${order.id}\n買家電話: ${buyerProfile?.phone || "未提供"}\n收件地址: ${order.recipientAddress}\n備註: ${order.notes || "無"}`,
+          const db = await getDb();
+          if (!db) throw new Error("Database not available");
+          
+          // 檢查是否已經有對話
+          let conversation = await db.select().from(conversations)
+            .where(
+              and(
+                or(
+                  and(eq(conversations.buyerId, order.buyerId), eq(conversations.sellerId, order.sellerId)),
+                  and(eq(conversations.buyerId, order.sellerId), eq(conversations.sellerId, order.buyerId))
+                )
+              )
+            )
+            .limit(1);
+          
+          let conversationId: number;
+          if (conversation.length === 0) {
+            // 創建新的對話
+            const result = await db.insert(conversations).values({
+              buyerId: order.buyerId,
+              sellerId: order.sellerId,
+              productId: order.id, // 使用 orderId 作為 productId
+              lastMessageAt: new Date(),
+            });
+            conversationId = (result as any)?.insertId ?? (result as any)?.[0]?.insertId;
+          } else {
+            conversationId = conversation[0].id;
+          }
+          
+          // 創建訊息
+          await db.insert(messages).values({
+            conversationId,
+            senderId: order.buyerId,
+            content: `你好，我對訂單 #${order.id} 感興趣。\n收件人: ${order.recipientName}\n收件电話: ${order.recipientPhone}\n收件地址: ${order.recipientAddress}${order.notes ? `\n備註: ${order.notes}` : ''}`,
+            createdAt: new Date(),
           });
-        } catch (notifyError) {
-          console.error("Failed to send seller notification:", notifyError);
+        } catch (messageError) {
+          console.error("Failed to send seller message:", messageError);
         }
 
         // 返回買家信息供賣家聯絡
