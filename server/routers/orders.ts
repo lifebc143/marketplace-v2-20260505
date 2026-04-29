@@ -235,8 +235,8 @@ export const ordersRouter = router({
           await db.insert(messages).values({
             conversationId,
             senderId: order.buyerId,
-            content: `你好，我對訂單 #${order.id} 感興趣。\n收件人: ${order.recipientName}\n收件电話: ${order.recipientPhone}\n收件地址: ${order.recipientAddress}${order.notes ? `\n備註: ${order.notes}` : ''}`,
-            createdAt: new Date(),
+            content: `你好，我對訂單 #${order.id} 感興趣。\n收件地址: ${order.shippingAddress || '未提供'}${order.notes ? `\n備註: ${order.notes}` : ''}`,
+            isRead: 0,
           });
         } catch (messageError) {
           console.error("Failed to send seller message:", messageError);
@@ -249,9 +249,9 @@ export const ordersRouter = router({
           buyerInfo: {
             orderId: order.id,
             buyerPhone: buyerProfile?.phone || "未提供",
-            recipientName: order.recipientName,
-            recipientPhone: order.recipientPhone,
-            recipientAddress: order.recipientAddress,
+            recipientName: "收件人姓名",
+            recipientPhone: "收件人電話",
+            recipientAddress: order.shippingAddress || "未提供",
             notes: order.notes,
           },
         };
@@ -292,7 +292,7 @@ export const ordersRouter = router({
         }
 
         // 只有待發貨或已發貨的訂單可以確認
-        if (order.status !== "shipped" && order.status !== "pending") {
+        if (order.status !== "pending") {
           throw new TRPCError({
             code: "BAD_REQUEST",
             message: "訂單狀態不允許確認",

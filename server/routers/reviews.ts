@@ -90,6 +90,7 @@ export const reviewsRouter = router({
         await createReview({
           productId: input.productId,
           buyerId: ctx.user.id,
+          sellerId: order.sellerId,
           orderId: input.orderId,
           rating: input.rating,
           title: input.title,
