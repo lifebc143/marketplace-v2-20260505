@@ -5,6 +5,12 @@ import { Bell } from "lucide-react";
 import NotificationCenter from "./NotificationCenter";
 
 export default function NotificationBell() {
+  // 暫時禁用通知功能，直到通知表初始化
+  // 返回 null 以隱藏通知鈴鐺
+  return null;
+
+  // 以下代碼在通知表初始化後可以啟用
+  /*
   const [isOpen, setIsOpen] = useState(false);
 
   // 獲取未讀通知數
@@ -12,18 +18,17 @@ export default function NotificationBell() {
     retry: false,
   });
 
-  // 定期刷新未讀通知數（只在成功時）
+  // 定期刷新未讀通知數
   useEffect(() => {
     if (isError) return;
     
     const interval = setInterval(() => {
       refetch();
-    }, 5000); // 每 5 秒刷新一次
+    }, 5000);
 
     return () => clearInterval(interval);
   }, [refetch, isError]);
 
-  // 如果通知系統出錯，隱藏通知鈴鐺
   if (isError) {
     return null;
   }
@@ -47,4 +52,5 @@ export default function NotificationBell() {
       <NotificationCenter isOpen={isOpen} onClose={() => setIsOpen(false)} />
     </>
   );
+  */
 }
