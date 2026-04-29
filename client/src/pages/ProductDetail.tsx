@@ -29,7 +29,7 @@ export default function ProductDetail() {
       // 調用後端 API 遞增瀏覽次數
       incrementViewsMutation.mutate({ id: productId });
     }
-  }, [productId, product?.id, incrementViewsMutation]);
+  }, [productId]); // 只依賴 productId，避免無限循環
 
   if (!productId) {
     return (
