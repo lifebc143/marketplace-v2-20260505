@@ -11,6 +11,7 @@ import ChatBox from "@/components/ChatBox";
 export default function ProductDetail() {
   const params = useParams();
   const [, navigate] = useLocation();
+  const { user } = useAuth();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   
   const productId = params?.id ? parseInt(params.id) : null;
@@ -217,7 +218,12 @@ export default function ProductDetail() {
                   variant="outline" 
                   className="w-full"
                   onClick={() => {
-                    toast.info("聯絡賣家功能即將推出");
+                    if (!user) {
+                      navigate("/");
+                      return;
+                    }
+                    // 導航到訊息頁面，開始與賣家對話
+                    navigate("/messages");
                   }}
                 >
                   聯絡賣家

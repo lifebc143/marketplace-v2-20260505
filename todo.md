@@ -185,4 +185,4 @@
 
 - [x] 分類部分沒有作用 - 修複了使用 search API 並根據分類策展商品
 - [x] 立即購買有問題，沒法寶出 - 修複了 products.getById 的雙重 images 處理和 createOrder/addOrderItem 的 insertId 取得
-- [x] 聯絡賣方沒動作 - 改為創建訊息並創建對話
+- [x] 聯絡賣方沒動作 - 改為創建訊息並創建對話，並在 ProductDetail 頁面实現联絡賣家按鈕
