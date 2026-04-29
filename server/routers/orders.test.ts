@@ -66,11 +66,10 @@ describe("Orders Router", () => {
         expect.objectContaining({
           buyerId: 123,
           sellerId: 789,
+          productId: 456,
           status: "pending",
-          totalAmount: 10000,
-          recipientName: "John Doe",
-          recipientPhone: "123-456-7890",
-          recipientAddress: "123 Main St, City, Country",
+          totalPrice: 10000,
+          shippingAddress: expect.stringContaining("John Doe"),
         })
       );
 

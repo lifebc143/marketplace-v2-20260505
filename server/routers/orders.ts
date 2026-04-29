@@ -53,11 +53,10 @@ export const ordersRouter = router({
         const order = await createOrder({
           buyerId: ctx.user.id,
           sellerId: product.userId,
+          productId: input.productId,
+          totalPrice: totalAmount,
           status: "pending",
-          totalAmount,
-          recipientName: input.recipientName,
-          recipientPhone: input.recipientPhone,
-          recipientAddress: input.recipientAddress,
+          shippingAddress: `收件人: ${input.recipientName}\n電話: ${input.recipientPhone}\n地址: ${input.recipientAddress}`,
           notes: input.notes || null,
         });
 
