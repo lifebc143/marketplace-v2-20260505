@@ -112,7 +112,10 @@ export default function Checkout() {
       });
 
       setOrderId(result.orderId);
-      setOrderCreated(true);
+      // 跳轉到訂單確認頁面
+      setTimeout(() => {
+        navigate(`/orders/${result.orderId}/confirmation`);
+      }, 500);
       toast.success("訂單已成功創建！");
     } catch (error: any) {
       console.error("Failed to create order:", error);
@@ -123,48 +126,13 @@ export default function Checkout() {
     }
   };
 
-  if (orderCreated && orderId) {
+  // 訂單已創建，頁面會自動跳轉到訂單確認頁面
+  if (orderCreated) {
     return (
-      <div className="min-h-screen bg-background text-foreground">
-        <div className="container py-8">
-          <Card className="max-w-2xl mx-auto p-8 text-center">
-            <div className="flex justify-center mb-6">
-              <div className="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center">
-                <Check className="w-8 h-8 text-accent" />
-              </div>
-            </div>
-            <h1 className="text-3xl font-bold mb-4">訂單已成功創建</h1>
-            <p className="text-muted-foreground mb-2">訂單編號：#{orderId}</p>
-            <p className="text-muted-foreground mb-6">感謝您的購買，請與賣家直接聯繫以完成交易</p>
-
-            {/* 免責聲明 */}
-            <div className="bg-secondary/10 rounded-lg p-4 mb-6 text-left border border-border">
-              <p className="text-sm font-bold text-foreground mb-3">重要提示 - 免責聲明：</p>
-              <ul className="text-xs text-muted-foreground space-y-2 ml-4">
-                <li>✓ 本訂單代表買賣雙方的個人交易行為</li>
-                <li>✓ 本網站僅提供交易平台，不涉及任何金流處理</li>
-                <li>✓ 交易的安全性、商品品質及售後服務由買賣雙方自行負責</li>
-                <li>✓ 本網站對交易過程中發生的任何糾紛不承擔責任</li>
-                <li>✓ 請與賣家直接聯繫確認交易細節和付款方式</li>
-              </ul>
-            </div>
-
-            <div className="space-y-3">
-              <Button
-                className="w-full bg-accent hover:bg-accent/90"
-                onClick={() => navigate("/orders")}
-              >
-                查看訂單詳情
-              </Button>
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => navigate("/")}
-              >
-                返回首頁
-              </Button>
-            </div>
-          </Card>
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-accent mx-auto mb-4" />
+          <p className="text-lg text-muted-foreground">正在跳轉到訂單確認頁面...</p>
         </div>
       </div>
     );
