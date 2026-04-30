@@ -232,8 +232,12 @@ export default function ProductDetail() {
                       navigate("/");
                       return;
                     }
-                    // 導航到訊息頁面，開始與賣家對話
-                    navigate("/messages");
+                    if (product?.userId === user.id) {
+                      toast.error("不能聯絡自己");
+                      return;
+                    }
+                    // 跳轉到訊息頁面，並帶上賣家 ID
+                    navigate(`/messages?sellerId=${product?.userId}`);
                   }}
                 >
                   聯絡賣家
