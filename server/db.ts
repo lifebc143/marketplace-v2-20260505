@@ -459,6 +459,11 @@ export async function getAverageRating(productId: number) {
  * Conversation queries
  */
 export async function createConversation(data: InsertConversation) {
+    // 將 productId 為 0 的轉換為 NULL
+    const normalizedData = {
+      ...data,
+      productId: (data.productId === 0 || data.productId === null) ? null : data.productId,
+    };
   const db = await getDb();
   if (!db) throw new Error('Database not available');
 

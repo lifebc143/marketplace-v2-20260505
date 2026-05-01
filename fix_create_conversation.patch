@@ -1,0 +1,31 @@
+--- a/server/db.ts
++++ b/server/db.ts
+@@ -461,6 +461,12 @@ export async function createConversation(data: InsertConversation) {
+   const db = await getDb();
+   if (!db) throw new Error('Database not available');
+ 
+   try {
++    // 將 productId 為 0 的轉換為 NULL
++    const normalizedData = {
++      ...data,
++      productId: (data.productId === 0 || data.productId === null) ? null : data.productId,
++    };
++
+     // Check if conversation already exists
+     const existing = await db.select().from(conversations)
+       .where(
+@@ -468,9 +474,9 @@ export async function createConversation(data: InsertConversation) {
+           eq(conversations.buyerId, data.buyerId),
+           eq(conversations.sellerId, data.sellerId),
+-          eq(conversations.productId, data.productId)
++          normalizedData.productId === null ? sql`${conversations.productId} IS NULL` : eq(conversations.productId, normalizedData.productId)
+         )
+       )
+       .limit(1);
+ 
+     if (existing.length > 0) {
+       return existing[0];
+     }
+ 
+-    const result = await db.insert(conversations).values(data);
++    const result = await db.insert(conversations).values(normalizedData);

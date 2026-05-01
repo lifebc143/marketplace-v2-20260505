@@ -32,28 +32,30 @@ export const messagesRouter = router({
   getOrCreateConversation: protectedProcedure
     .input(
       z.object({
-        productId: z.number(),
+        productId: z.number().optional(),
         sellerId: z.number(),
         orderId: z.number().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
       try {
-        // 驗證商品存在
-        const product = await getProductById(input.productId);
-        if (!product) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "商品不存在",
-          });
-        }
+        // 驗證商品存在（如果提供了 productId）
+        if (input.productId && input.productId !== 0) {
+          const product = await getProductById(input.productId);
+          if (!product) {
+            throw new TRPCError({
+              code: "NOT_FOUND",
+              message: "商品不存在",
+            });
+          }
 
-        // 驗證賣家
-        if (product.userId !== input.sellerId) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "賣家信息不正確",
-          });
+          // 驗證賣家
+          if (product.userId !== input.sellerId) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "賣家信息不正確",
+            });
+          }
         }
 
         // 防止與自己對話
