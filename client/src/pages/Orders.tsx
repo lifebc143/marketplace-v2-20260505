@@ -155,22 +155,22 @@ export default function Orders() {
                     <div className="space-y-2 mb-4 pb-4 border-b border-border">
                       <p className="text-sm">
                         <span className="text-muted-foreground">收件人：</span>
-                        <span className="font-medium">{order.recipientName}</span>
+                        <span className="font-medium">{order.shippingAddress?.split(",")[0] || "N/A"}</span>
                       </p>
                       <p className="text-sm">
                         <span className="text-muted-foreground">電話：</span>
-                        <span className="font-medium">{order.recipientPhone}</span>
+                        <span className="font-medium">{order.shippingAddress?.split(",")[1] || "N/A"}</span>
                       </p>
                       <p className="text-sm">
                         <span className="text-muted-foreground">地址：</span>
-                        <span className="font-medium line-clamp-1">{order.recipientAddress}</span>
+                        <span className="font-medium line-clamp-1">{order.shippingAddress || "N/A"}</span>
                       </p>
                     </div>
 
                     <div className="flex items-center justify-between">
                       <span className="text-muted-foreground">訂單總額</span>
                       <span className="text-2xl font-bold text-accent">
-                        NT${(order.totalAmount / 100).toFixed(0)}
+                        NT${(order.totalPrice / 100).toFixed(0)}
                       </span>
                     </div>
                   </Card>
@@ -212,17 +212,17 @@ export default function Orders() {
                   <div className="space-y-4 mb-6 pb-6 border-b border-border">
                     <div>
                       <p className="text-xs text-muted-foreground mb-1">收件人</p>
-                      <p className="font-medium">{selectedOrder.recipientName}</p>
+                      <p className="font-medium">{selectedOrder.shippingAddress?.split(",")[0] || "N/A"}</p>
                     </div>
 
                     <div>
                       <p className="text-xs text-muted-foreground mb-1">電話</p>
-                      <p className="font-medium">{selectedOrder.recipientPhone}</p>
+                      <p className="font-medium">{selectedOrder.shippingAddress?.split(",")[1] || "N/A"}</p>
                     </div>
 
                     <div>
                       <p className="text-xs text-muted-foreground mb-1">地址</p>
-                      <p className="font-medium text-sm">{selectedOrder.recipientAddress}</p>
+                      <p className="font-medium text-sm">{selectedOrder.shippingAddress || "N/A"}</p>
                     </div>
 
                     {selectedOrder.notes && (
@@ -236,7 +236,7 @@ export default function Orders() {
                   <div className="mb-6 pb-6 border-b border-border">
                     <p className="text-xs text-muted-foreground mb-2">訂單總額</p>
                     <p className="text-3xl font-bold text-accent">
-                      NT${(selectedOrder.totalAmount / 100).toFixed(0)}
+                      NT${(selectedOrder.totalPrice / 100).toFixed(0)}
                     </p>
                   </div>
 

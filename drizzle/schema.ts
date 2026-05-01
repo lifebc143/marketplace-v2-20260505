@@ -74,7 +74,7 @@ export const orders = mysqlTable("orders", {
 	sellerId: int().notNull().references(() => users.id, { onDelete: "cascade" } ),
 	productId: int().notNull().references(() => products.id, { onDelete: "cascade" } ),
 	totalPrice: int().notNull(),
-	status: mysqlEnum(['pending','completed','cancelled','disputed']).default('pending').notNull(),
+	status: mysqlEnum(['pending','completed','cancelled','disputed','delivered','shipped','confirmed']).default('pending').notNull(),
 	shippingAddress: text(),
 	trackingNumber: varchar({ length: 100 }),
 	notes: text(),

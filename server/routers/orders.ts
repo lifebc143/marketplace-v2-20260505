@@ -222,7 +222,8 @@ export const ordersRouter = router({
             const result = await db.insert(conversations).values({
               buyerId: order.buyerId,
               sellerId: order.sellerId,
-              productId: order.id, // 使用 orderId 作為 productId
+              productId: order.productId,
+              orderId: order.id,
               lastMessageAt: new Date(),
             });
             conversationId = (result as any)?.insertId ?? (result as any)?.[0]?.insertId;
