@@ -115,7 +115,7 @@ export const conversations = mysqlTable("conversations", {
 	id: int().autoincrement().notNull(),
 	buyerId: int().notNull().references(() => users.id, { onDelete: "cascade" } ),
 	sellerId: int().notNull().references(() => users.id, { onDelete: "cascade" } ),
-	productId: int().notNull().references(() => products.id, { onDelete: "cascade" } ),
+	productId: int().references(() => products.id, { onDelete: "cascade" } ),
 	orderId: int().references(() => orders.id, { onDelete: "set null" } ),
 	lastMessageAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
 	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
