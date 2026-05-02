@@ -21,6 +21,7 @@ import Orders from "./pages/Orders";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import Policy from "./pages/Policy";
 import Messages from "./pages/Messages";
+import EditProduct from "./pages/EditProduct";
 
 function Router() {
   // Route order matters: specific routes must come before dynamic ones
@@ -32,6 +33,7 @@ function Router() {
       <Route path={"/"} component={Home} />
       <Route path={"/products"} component={ProductList} />
       <Route path={"/products/create"} component={CreateProduct} />
+      <Route path={"/products/:id/edit"} component={EditProduct} />
       <Route path={"/checkout"} component={Checkout} />
       <Route path={"/orders"} component={Orders} />
       <Route path={"/orders/:id/confirmation"} component={OrderConfirmation} />
