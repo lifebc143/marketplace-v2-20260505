@@ -155,15 +155,15 @@ export default function Orders() {
                     <div className="space-y-2 mb-4 pb-4 border-b border-border">
                       <p className="text-sm">
                         <span className="text-muted-foreground">收件人：</span>
-                        <span className="font-medium">{order.shippingAddress?.split(",")[0] || "N/A"}</span>
+                        <span className="font-medium">{order.recipientName || "N/A"}</span>
                       </p>
                       <p className="text-sm">
                         <span className="text-muted-foreground">電話：</span>
-                        <span className="font-medium">{order.shippingAddress?.split(",")[1] || "N/A"}</span>
+                        <span className="font-medium">{order.recipientPhone || "N/A"}</span>
                       </p>
                       <p className="text-sm">
                         <span className="text-muted-foreground">地址：</span>
-                        <span className="font-medium line-clamp-1">{order.shippingAddress || "N/A"}</span>
+                        <span className="font-medium line-clamp-1">{order.recipientAddress || "N/A"}</span>
                       </p>
                     </div>
 
@@ -212,17 +212,17 @@ export default function Orders() {
                   <div className="space-y-4 mb-6 pb-6 border-b border-border">
                     <div>
                       <p className="text-xs text-muted-foreground mb-1">收件人</p>
-                      <p className="font-medium">{selectedOrder.shippingAddress?.split(",")[0] || "N/A"}</p>
+                      <p className="font-medium">{selectedOrder.recipientName || "N/A"}</p>
                     </div>
 
                     <div>
                       <p className="text-xs text-muted-foreground mb-1">電話</p>
-                      <p className="font-medium">{selectedOrder.shippingAddress?.split(",")[1] || "N/A"}</p>
+                      <p className="font-medium">{selectedOrder.recipientPhone || "N/A"}</p>
                     </div>
 
                     <div>
                       <p className="text-xs text-muted-foreground mb-1">地址</p>
-                      <p className="font-medium text-sm">{selectedOrder.shippingAddress || "N/A"}</p>
+                      <p className="font-medium text-sm">{selectedOrder.recipientAddress || "N/A"}</p>
                     </div>
 
                     {selectedOrder.notes && (
