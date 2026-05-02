@@ -56,7 +56,9 @@ export const ordersRouter = router({
           productId: input.productId,
           totalPrice: totalAmount,
           status: "pending",
-          shippingAddress: `收件人: ${input.recipientName}\n電話: ${input.recipientPhone}\n地址: ${input.recipientAddress}`,
+          recipientName: input.recipientName,
+          recipientPhone: input.recipientPhone,
+          recipientAddress: input.recipientAddress,
           notes: input.notes || null,
         });
 
@@ -235,23 +237,23 @@ export const ordersRouter = router({
           await db.insert(messages).values({
             conversationId,
             senderId: order.buyerId,
-            content: `你好，我對訂單 #${order.id} 感興趣。\n收件地址: ${order.shippingAddress || '未提供'}${order.notes ? `\n備註: ${order.notes}` : ''}`,
+            content: `你好，我對訂單 #${order.id} 感興趣。\n收件人: ${order.recipientName || '未提供'}\n電話: ${order.recipientPhone || '未提供'}\n地址: ${order.recipientAddress || '未提供'}${order.notes ? `\n備註: ${order.notes}` : ''}`,
             isRead: 0,
           });
         } catch (messageError) {
           console.error("Failed to send seller message:", messageError);
         }
 
-        // 返回買家信息供賣家聯絡
+        // 返回買家信息供賣家联絡
         return {
           success: true,
-          message: "已向賣家發送你的聯絡信息",
+          message: "已向賣家發送你的联絡信息",
           buyerInfo: {
             orderId: order.id,
             buyerPhone: buyerProfile?.phone || "未提供",
-            recipientName: "收件人姓名",
-            recipientPhone: "收件人電話",
-            recipientAddress: order.shippingAddress || "未提供",
+            recipientName: order.recipientName || "未提供",
+            recipientPhone: order.recipientPhone || "未提供",
+            recipientAddress: order.recipientAddress || "未提供",
             notes: order.notes,
           },
         };

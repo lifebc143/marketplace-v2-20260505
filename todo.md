@@ -190,3 +190,12 @@
 ## 修復的問題 - 商品瀏覽次數
 
 - [x] 修復商品瀏覽次數不遞增的問題 - 實現了 incrementProductViews 函數、tRPC 程序並在 ProductDetail 頁面整合
+
+## 修復的問題 - 訂單信息欄位錯亂
+
+- [x] 診斷訂單數據庫 schema 不匹配問題 - 發現 orders 表缺少 recipientName、recipientPhone、recipientAddress 欄位
+- [x] 執行 SQL 遷移添加新欄位到 orders 表
+- [x] 修改後端代碼使用分離的收件人欄位而不是合併的 shippingAddress
+- [x] 更新訂單確認頁面顯示邏輯以正確展示收件人信息
+- [x] 驗證訂單創建功能正常工作
+- [x] 驗證聯絡賣家功能正常工作並將訊息保存到數據庫

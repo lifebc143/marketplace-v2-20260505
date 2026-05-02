@@ -145,11 +145,18 @@ export default function OrderConfirmation() {
                 收件地址
               </h2>
               <div className="space-y-3 text-muted-foreground">
-                {order.shippingAddress ? (
-                  <p className="whitespace-pre-wrap">{order.shippingAddress}</p>
-                ) : (
-                  <p>未提供收件地址</p>
-                )}
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">收件人</p>
+                  <p className="font-medium text-foreground">{order.recipientName || '未提供'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">電話</p>
+                  <p className="font-medium text-foreground">{order.recipientPhone || '未提供'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">地址</p>
+                  <p className="font-medium text-foreground whitespace-pre-wrap">{order.recipientAddress || '未提供'}</p>
+                </div>
               </div>
             </Card>
 
