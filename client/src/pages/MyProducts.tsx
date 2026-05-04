@@ -92,9 +92,17 @@ export default function MyProducts() {
             {products.map((product) => (
               <Card key={product.id} className="p-6">
                 <div className="flex gap-6">
-                  {/* Product Image Placeholder */}
-                  <div className="w-32 h-32 bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <ShoppingBag className="w-12 h-12 text-muted-foreground" />
+                  {/* Product Image */}
+                  <div className="w-32 h-32 bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                    {product.images && product.images.length > 0 ? (
+                      <img
+                        src={product.images[0].url}
+                        alt={product.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <ShoppingBag className="w-12 h-12 text-muted-foreground" />
+                    )}
                   </div>
 
                   {/* Product Info */}

@@ -148,7 +148,17 @@ export async function getProductsByUserId(userId: number) {
   const db = await getDb();
   if (!db) return [];
   
-  return db.select().from(products).where(eq(products.userId, userId));
+  const userProducts = await db.select().from(products).where(eq(products.userId, userId));
+  
+  // Add images to each product
+  const productsWithImages = await Promise.all(
+    userProducts.map(async (product) => {
+      const images = await getProductImages(product.id);
+      return { ...product, images };
+    })
+  );
+  
+  return productsWithImages;
 }
 
 export async function searchProducts(query: string, categoryId?: number, limit: number = 20, offset: number = 0) {

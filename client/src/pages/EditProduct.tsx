@@ -122,7 +122,9 @@ export default function EditProduct() {
       toast.error("請選擇商品分類");
       return;
     }
-    if (uploadedImages.length === 0 && existingImages.length === 0) {
+    // Only require images if no existing images (new product)
+    // For editing, allow keeping existing images without uploading new ones
+    if (existingImages.length === 0) {
       toast.error("請至少保留一張商品圖片");
       return;
     }

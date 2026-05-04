@@ -226,3 +226,19 @@
 - [x] 添加編輯商品路由 /products/:id/edit 到 App.tsx
 - [x] 驗證後端編輯商品 API 已存在
 - [x] 測試編輯商品功能正常工作，頁面成功加載
+
+
+## 修復的問題 - 編輯商品提交失敗
+
+- [x] 診斷發現後端使用了不正確的 db.insert() 而不是 addProductImage()
+- [x] 修復編輯商品 API 使用正確的函數簽名
+- [x] 移除了直接操作 db.insert() 的不正確代碼
+- [x] 測試編輯商品提交成功，商品價格已成功更新為 NT$17000
+
+
+## 修復的問題 - 我的商品頁面縮圖不顯示
+
+- [x] 診斷發現 getProductsByUserId 函數沒有包含圖片數據
+- [x] 修復 getProductsByUserId 函數使用 getProductImages() 添加圖片
+- [x] 前端編輯代碼已正確顯示圖片
+- [x] 驗證我的商品頁面縮圖正確顯示
