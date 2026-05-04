@@ -15,6 +15,7 @@ export default function Profile() {
   const [, navigate] = useLocation();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
+    name: "",
     bio: "",
     phone: "",
     address: "",
@@ -37,14 +38,15 @@ export default function Profile() {
 
   // Initialize form data from profile
   useEffect(() => {
-    if (profileData?.profile) {
+    if (profileData?.profile || user) {
       setFormData({
-        bio: profileData.profile.bio || "",
-        phone: profileData.profile.phone || "",
-        address: profileData.profile.address || "",
+        name: user?.name || "",
+        bio: profileData?.profile?.bio || "",
+        phone: profileData?.profile?.phone || "",
+        address: profileData?.profile?.address || "",
       });
     }
-  }, [profileData]);
+  }, [profileData, user]);
 
   // Update profile mutation
   const updateProfileMutation = trpc.users.updateProfile.useMutation({
@@ -68,7 +70,12 @@ export default function Profile() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await updateProfileMutation.mutateAsync(formData);
+    // Only send profile fields to the API (bio, phone, address)
+    await updateProfileMutation.mutateAsync({
+      bio: formData.bio,
+      phone: formData.phone,
+      address: formData.address,
+    });
   };
 
   const handleLogout = async () => {
