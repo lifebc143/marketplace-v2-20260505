@@ -129,9 +129,10 @@ export default function Orders() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Orders List */}
             <div className="lg:col-span-2 space-y-4">
-              {orders.map((order) => {
+              {orders.map((order: any) => {
                 const statusInfo = getStatusLabel(order.status);
                 const StatusIcon = statusInfo.icon;
+                const productImage = order.product?.images?.[0]?.imageUrl;
 
                 return (
                   <Card
@@ -140,7 +141,7 @@ export default function Orders() {
                     onClick={() => setSelectedOrderId(order.id)}
                   >
                     <div className="flex items-start justify-between mb-4">
-                      <div>
+                      <div className="flex-1">
                         <h3 className="font-bold text-lg">訂單 #{order.id}</h3>
                         <p className="text-sm text-muted-foreground">
                           {new Date(order.createdAt).toLocaleDateString("zh-TW")}
@@ -151,6 +152,32 @@ export default function Orders() {
                         <span className="text-sm font-medium">{statusInfo.label}</span>
                       </div>
                     </div>
+
+                    {/* Product Image and Info */}
+                    {order.product && (
+                      <div className="flex gap-4 mb-4 pb-4 border-b border-border">
+                        {productImage && (
+                          <div className="flex-shrink-0">
+                            <img
+                              src={productImage}
+                              alt={order.product.title}
+                              className="w-24 h-24 object-cover rounded-lg"
+                            />
+                          </div>
+                        )}
+                        <div className="flex-1">
+                          <p className="font-semibold text-base line-clamp-2">
+                            {order.product.title}
+                          </p>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            NT${(order.product.price / 100).toFixed(0)}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-2">
+                            狀態：{order.product.condition === 'like_new' ? '如新' : order.product.condition === 'good' ? '良好' : '尚可'}
+                          </p>
+                        </div>
+                      </div>
+                    )}
 
                     <div className="space-y-2 mb-4 pb-4 border-b border-border">
                       <p className="text-sm">
@@ -183,6 +210,34 @@ export default function Orders() {
               <div className="lg:col-span-1">
                 <Card className="p-6 sticky top-4">
                   <h2 className="text-xl font-bold mb-4">訂單詳情</h2>
+
+                  {/* Product Details */}
+                  {(selectedOrder as any).product && (
+                    <div className="mb-6 pb-6 border-b border-border">
+                      <p className="text-xs text-muted-foreground mb-3 font-semibold">商品信息</p>
+                      {(selectedOrder as any).product.images?.[0]?.imageUrl && (
+                        <img
+                          src={(selectedOrder as any).product.images[0].imageUrl}
+                          alt={(selectedOrder as any).product.title}
+                          className="w-full h-32 object-cover rounded-lg mb-3"
+                        />
+                      )}
+                      <p className="font-semibold text-sm mb-2">
+                        {(selectedOrder as any).product.title}
+                      </p>
+                      <p className="text-sm text-accent font-bold mb-2">
+                        NT${((selectedOrder as any).product.price / 100).toFixed(0)}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        狀態：{(selectedOrder as any).product.condition === 'like_new' ? '如新' : (selectedOrder as any).product.condition === 'good' ? '良好' : '尚可'}
+                      </p>
+                      {(selectedOrder as any).product.description && (
+                        <p className="text-xs text-muted-foreground mt-2 line-clamp-3">
+                          {(selectedOrder as any).product.description}
+                        </p>
+                      )}
+                    </div>
+                  )}
 
                   <div className="space-y-4 mb-6 pb-6 border-b border-border">
                     <div>

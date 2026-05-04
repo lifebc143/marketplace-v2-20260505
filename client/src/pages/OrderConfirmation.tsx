@@ -124,6 +124,43 @@ export default function OrderConfirmation() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Order Details */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Product Information */}
+            {(order as any).product && (
+              <Card className="p-6">
+                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                  <Package className="w-5 h-5" />
+                  商品信息
+                </h2>
+                <div className="flex gap-4">
+                  {(order as any).product.images?.[0]?.imageUrl && (
+                    <div className="flex-shrink-0">
+                      <img
+                        src={(order as any).product.images[0].imageUrl}
+                        alt={(order as any).product.title}
+                        className="w-32 h-32 object-cover rounded-lg"
+                      />
+                    </div>
+                  )}
+                  <div className="flex-1">
+                    <p className="font-semibold text-base mb-2">
+                      {(order as any).product.title}
+                    </p>
+                    <p className="text-lg font-bold text-accent mb-2">
+                      NT${((order as any).product.price / 100).toFixed(0)}
+                    </p>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      狀態：{(order as any).product.condition === 'like_new' ? '如新' : (order as any).product.condition === 'good' ? '良好' : '尚可'}
+                    </p>
+                    {(order as any).product.description && (
+                      <p className="text-sm text-muted-foreground line-clamp-2">
+                        {(order as any).product.description}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </Card>
+            )}
+
             {/* Order Status */}
             <Card className="p-6">
               <h2 className="text-xl font-bold mb-4">訂單狀態</h2>

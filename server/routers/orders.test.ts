@@ -272,3 +272,242 @@ describe("Orders Router", () => {
     });
   });
 });
+
+
+describe("Orders Router - Product Image Display", () => {
+  describe("getOrderById - Product Image Inclusion", () => {
+    it("should return order with product information including images", async () => {
+      const mockOrder = {
+        id: 1,
+        buyerId: 123,
+        sellerId: 456,
+        productId: 789,
+        totalPrice: 59900,
+        status: "pending",
+        recipientName: "John Doe",
+        recipientPhone: "0987654321",
+        recipientAddress: "123 Main St",
+        trackingNumber: null,
+        notes: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        product: {
+          id: 789,
+          userId: 456,
+          title: "Airpods Pro",
+          description: "Airpods Pro一代降噪版",
+          price: 59900,
+          categoryId: 1,
+          status: "active",
+          condition: "like_new",
+          views: 100,
+          isAiGenerated: 0,
+          createdAt: new Date(),
+          images: [
+            {
+              id: 1,
+              productId: 789,
+              imageUrl: "/manus-storage/airpods-pro-1.jpg",
+              imageKey: "airpods-pro-1",
+              displayOrder: 0,
+              isAiGenerated: 0,
+              createdAt: new Date(),
+            },
+          ],
+        },
+      };
+
+      const mockContext = {
+        user: { id: 123, email: "test@example.com", role: "user" as const },
+        req: {} as any,
+        res: {} as any,
+      };
+
+      (db.getOrderById as any).mockResolvedValue(mockOrder);
+
+      const caller = ordersRouter.createCaller(mockContext);
+      const result = await caller.getById({ id: 1 });
+
+      expect(result).toBeDefined();
+      expect((result as any).product).toBeDefined();
+      expect((result as any).product.images).toHaveLength(1);
+      expect((result as any).product.images[0].imageUrl).toBe(
+        "/manus-storage/airpods-pro-1.jpg"
+      );
+    });
+
+    it("should return order with product that has multiple images", async () => {
+      const mockOrder = {
+        id: 2,
+        buyerId: 123,
+        sellerId: 456,
+        productId: 790,
+        totalPrice: 99900,
+        status: "pending",
+        recipientName: "Jane Doe",
+        recipientPhone: "0987654322",
+        recipientAddress: "456 Oak St",
+        trackingNumber: null,
+        notes: "Fragile - Handle with care",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        product: {
+          id: 790,
+          userId: 456,
+          title: "Camera Kit",
+          description: "Professional camera kit with accessories",
+          price: 99900,
+          categoryId: 3,
+          status: "active",
+          condition: "like_new",
+          views: 200,
+          isAiGenerated: 0,
+          createdAt: new Date(),
+          images: [
+            {
+              id: 3,
+              productId: 790,
+              imageUrl: "/manus-storage/camera-1.jpg",
+              imageKey: "camera-1",
+              displayOrder: 0,
+              isAiGenerated: 0,
+              createdAt: new Date(),
+            },
+            {
+              id: 4,
+              productId: 790,
+              imageUrl: "/manus-storage/camera-2.jpg",
+              imageKey: "camera-2",
+              displayOrder: 1,
+              isAiGenerated: 0,
+              createdAt: new Date(),
+            },
+          ],
+        },
+      };
+
+      const mockContext = {
+        user: { id: 123, email: "test@example.com", role: "user" as const },
+        req: {} as any,
+        res: {} as any,
+      };
+
+      (db.getOrderById as any).mockResolvedValue(mockOrder);
+
+      const caller = ordersRouter.createCaller(mockContext);
+      const result = await caller.getById({ id: 2 });
+
+      expect((result as any).product.images).toHaveLength(2);
+      expect((result as any).product.images[0].imageUrl).toBe(
+        "/manus-storage/camera-1.jpg"
+      );
+      expect((result as any).product.images[1].imageUrl).toBe(
+        "/manus-storage/camera-2.jpg"
+      );
+    });
+  });
+
+  describe("getMyOrders - Product Images Inclusion", () => {
+    it("should return all orders with product images", async () => {
+      const mockOrders = [
+        {
+          id: 1,
+          buyerId: 123,
+          sellerId: 456,
+          productId: 789,
+          totalPrice: 59900,
+          status: "pending",
+          recipientName: "John Doe",
+          recipientPhone: "0987654321",
+          recipientAddress: "123 Main St",
+          trackingNumber: null,
+          notes: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          product: {
+            id: 789,
+            userId: 456,
+            title: "Airpods Pro",
+            description: "Airpods Pro一代降噪版",
+            price: 59900,
+            categoryId: 1,
+            status: "active",
+            condition: "like_new",
+            views: 100,
+            isAiGenerated: 0,
+            createdAt: new Date(),
+            images: [
+              {
+                id: 1,
+                productId: 789,
+                imageUrl: "/manus-storage/airpods-pro-1.jpg",
+                imageKey: "airpods-pro-1",
+                displayOrder: 0,
+                isAiGenerated: 0,
+                createdAt: new Date(),
+              },
+            ],
+          },
+        },
+        {
+          id: 2,
+          buyerId: 123,
+          sellerId: 789,
+          productId: 790,
+          totalPrice: 29900,
+          status: "shipped",
+          recipientName: "Jane Doe",
+          recipientPhone: "0987654322",
+          recipientAddress: "456 Oak St",
+          trackingNumber: "TRACK123456",
+          notes: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          product: {
+            id: 790,
+            userId: 789,
+            title: "Used Laptop",
+            description: "Good condition laptop",
+            price: 29900,
+            categoryId: 2,
+            status: "active",
+            condition: "good",
+            views: 50,
+            isAiGenerated: 0,
+            createdAt: new Date(),
+            images: [
+              {
+                id: 2,
+                productId: 790,
+                imageUrl: "/manus-storage/laptop-1.jpg",
+                imageKey: "laptop-1",
+                displayOrder: 0,
+                isAiGenerated: 0,
+                createdAt: new Date(),
+              },
+            ],
+          },
+        },
+      ];
+
+      const mockContext = {
+        user: { id: 123, email: "test@example.com", role: "user" as const },
+        req: {} as any,
+        res: {} as any,
+      };
+
+      (db.getOrdersByBuyerId as any).mockResolvedValue(mockOrders);
+
+      const caller = ordersRouter.createCaller(mockContext);
+      const result = await caller.getMyOrders();
+
+      expect(result).toHaveLength(2);
+      expect((result as any)[0].product?.images?.[0].imageUrl).toBe(
+        "/manus-storage/airpods-pro-1.jpg"
+      );
+      expect((result as any)[1].product?.images?.[0].imageUrl).toBe(
+        "/manus-storage/laptop-1.jpg"
+      );
+    });
+  });
+});

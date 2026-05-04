@@ -318,14 +318,37 @@ export async function getOrderById(orderId: number) {
   if (!db) return undefined;
 
   const order = await db.select().from(orders).where(eq(orders.id, orderId)).limit(1);
-  return order[0];
+  if (!order[0]) return undefined;
+
+  // Get product information
+  const product = await db.select().from(products).where(eq(products.id, order[0].productId)).limit(1);
+  const productImages = product[0] ? await getProductImages(product[0].id) : [];
+
+  return {
+    ...order[0],
+    product: product[0] ? { ...product[0], images: productImages } : null,
+  };
 }
 
 export async function getOrdersByBuyerId(buyerId: number) {
   const db = await getDb();
   if (!db) return [];
 
-  return db.select().from(orders).where(eq(orders.buyerId, buyerId));
+  const orderList = await db.select().from(orders).where(eq(orders.buyerId, buyerId));
+
+  // Add product information to each order
+  const ordersWithProducts = await Promise.all(
+    orderList.map(async (order) => {
+      const product = await db.select().from(products).where(eq(products.id, order.productId)).limit(1);
+      const productImages = product[0] ? await getProductImages(product[0].id) : [];
+      return {
+        ...order,
+        product: product[0] ? { ...product[0], images: productImages } : null,
+      };
+    })
+  );
+
+  return ordersWithProducts;
 }
 
 export async function getOrdersBySellerId(sellerId: number) {
