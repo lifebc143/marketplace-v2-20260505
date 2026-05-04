@@ -674,7 +674,19 @@ export async function updateUserProfile(userId: number, data: Partial<InsertUser
   const db = await getDb();
   if (!db) throw new Error('Database not available');
 
-  await db.update(userProfiles).set(data).where(eq(userProfiles.userId, userId));
+  // Check if profile exists
+  const existing = await db.select().from(userProfiles).where(eq(userProfiles.userId, userId)).limit(1);
+  
+  if (existing.length > 0) {
+    // Update existing profile
+    await db.update(userProfiles).set(data).where(eq(userProfiles.userId, userId));
+  } else {
+    // Insert new profile if it doesn't exist
+    await db.insert(userProfiles).values({
+      userId,
+      ...data,
+    });
+  }
 }
 
 /**

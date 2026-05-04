@@ -32,6 +32,9 @@ export default function Profile() {
     enabled: isAuthenticated,
   });
 
+  // Get utils for query invalidation
+  const utils = trpc.useUtils();
+
   // Initialize form data from profile
   useEffect(() => {
     if (profileData?.profile) {
@@ -45,9 +48,11 @@ export default function Profile() {
 
   // Update profile mutation
   const updateProfileMutation = trpc.users.updateProfile.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("檔案已更新");
       setIsEditing(false);
+      // Invalidate and refetch the profile data
+      await utils.users.me.invalidate();
     },
     onError: (error) => {
       toast.error(error.message || "更新失敗");
