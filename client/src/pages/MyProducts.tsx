@@ -96,7 +96,7 @@ export default function MyProducts() {
                   <div className="w-32 h-32 bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
                     {product.images && product.images.length > 0 ? (
                       <img
-                        src={product.images[0].url}
+                        src={product.images[0].imageUrl}
                         alt={product.title}
                         className="w-full h-full object-cover"
                       />
