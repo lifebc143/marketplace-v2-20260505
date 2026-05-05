@@ -12,7 +12,7 @@ import { getCategoryTranslationKey } from "@/lib/categoryTranslation";
 
 export default function Home() {
   const { user, isAuthenticated } = useAuth();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState<number | undefined>();
 
   // Fetch categories
@@ -98,7 +98,7 @@ export default function Home() {
                   onClick={() => setSelectedCategory(category.id)}
                   className="whitespace-nowrap"
                 >
-                  {t(getCategoryTranslationKey(category.name))}
+                  {getCategoryTranslationKey(category.name, i18n.language)}
                 </Button>
               ))}
             </div>

@@ -3,8 +3,8 @@
  * Maps category names to display names for i18n support
  */
 
-// Map of category names to their display names (supports both Chinese and English)
-export const categoryDisplayNameMap: Record<string, string> = {
+// Map of category names to their Chinese display names
+export const categoryDisplayNameMapZh: Record<string, string> = {
   // Electronics
   "Electronics -電子產品": "電子產品",
   "Electronics": "電子產品",
@@ -48,27 +48,78 @@ export const categoryDisplayNameMap: Record<string, string> = {
   "辦公用品": "辦公用品",
   "寵物": "寵物",
   "門禁設備": "門禁設備",
+  "香水": "香水",
+  "男女服飾": "男女服飾",
+};
+
+// Map of category names to their English display names
+export const categoryDisplayNameMapEn: Record<string, string> = {
+  // Electronics
+  "Electronics -電子產品": "Electronics",
+  "Electronics": "Electronics",
+  
+  // House Related
+  "House Related 房屋用品": "House Related",
+  "House Related": "House Related",
+  "房屋用品": "House Related",
+  
+  // Clothing
+  "服飾": "Clothing",
+  "Clothing": "Clothing",
+  
+  // Sports
+  "運動用品": "Sports",
+  "Sports": "Sports",
+  
+  // Free Items
+  "免費商品": "Free Items",
+  "Free Items": "Free Items",
+  
+  // Automotive
+  "汽車類": "Automotive",
+  "汽車相關": "Automotive",
+  "Automotive": "Automotive",
+  "機車": "Motorcycles",
+  
+  // Accessories
+  "飾品": "Accessories",
+  "Accessories": "Accessories",
+  
+  // House Rental
+  "房屋租賃": "House Rental",
+  "House Rental": "House Rental",
+  
+  // Others - keep original names in English
+  "分類廣告": "Classified Ads",
+  "找工作": "Jobs",
+  "相親-男女": "Dating",
+  "其他類別": "Other",
+  "辦公用品": "Office Supplies",
+  "寵物": "Pets",
+  "門禁設備": "Access Control",
+  "香水": "Perfume",
+  "男女服飾": "Men & Women Fashion",
 };
 
 /**
- * Get display name for a category
- * If no mapping exists, return the original name
+ * Get display name for a category based on current language
  * @param categoryName - The category name from database
+ * @param language - The language code ('zh' or 'en')
  * @returns The display name
  */
-export function getCategoryDisplayName(categoryName: string): string {
-  return categoryDisplayNameMap[categoryName] || categoryName;
+export function getCategoryDisplayName(categoryName: string, language: string = 'zh'): string {
+  const map = language === 'en' ? categoryDisplayNameMapEn : categoryDisplayNameMapZh;
+  return map[categoryName] || categoryName;
 }
 
 /**
- * Get translation key for a category name (for backward compatibility)
+ * Get translation key for a category name
  * @param categoryName - The category name from database
- * @returns The i18n translation key
+ * @param language - The language code ('zh' or 'en')
+ * @returns The i18n translation key or display name
  */
-export function getCategoryTranslationKey(categoryName: string): string {
-  // Return the display name directly - it will be shown as-is
-  // This allows all categories to display properly without needing translation keys
-  return getCategoryDisplayName(categoryName);
+export function getCategoryTranslationKey(categoryName: string, language: string = 'zh'): string {
+  return getCategoryDisplayName(categoryName, language);
 }
 
 /**
@@ -76,5 +127,5 @@ export function getCategoryTranslationKey(categoryName: string): string {
  * @returns Array of all translation keys
  */
 export function getAllCategoryKeys(): string[] {
-  return Object.values(categoryDisplayNameMap);
+  return Object.values(categoryDisplayNameMapZh);
 }

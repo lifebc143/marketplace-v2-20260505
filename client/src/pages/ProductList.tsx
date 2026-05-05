@@ -17,7 +17,7 @@ import { getCategoryTranslationKey } from "@/lib/categoryTranslation";
 
 export default function ProductList() {
   const [, setLocation] = useLocation();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [offset, setOffset] = useState(0);
@@ -96,7 +96,7 @@ export default function ProductList() {
                       <SelectItem value="all">{t("products.category")}</SelectItem>
                       {categories.map((category) => (
                         <SelectItem key={category.id} value={category.id.toString()}>
-                          {t(getCategoryTranslationKey(category.name))}
+                          {getCategoryTranslationKey(category.name, i18n.language)}
                         </SelectItem>
                       ))}
                     </SelectContent>
