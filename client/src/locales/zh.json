@@ -29,7 +29,19 @@
     "popular": "最熱門",
     "priceAsc": "價格低到高",
     "priceDesc": "價格高到低",
-    "noResults": "沒有找到商品"
+    "noResults": "沒有找到商品",
+    "clearFilters": "清除篩選",
+    "categories": {
+      "electronics": "電子產品",
+      "clothing": "服飾",
+      "houseRelated": "家居",
+      "automotive": "汽車相關",
+      "machinery": "機械",
+      "sports": "運動用品",
+      "furniture": "家具",
+      "houseRental": "免費商品",
+      "other": "其他"
+    }
   },
   "productDetail": {
     "price": "價格",

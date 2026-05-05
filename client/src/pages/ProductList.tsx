@@ -13,6 +13,7 @@ import {
 import { Loader2, ShoppingBag, Search, ArrowLeft } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
+import { getCategoryTranslationKey } from "@/lib/categoryTranslation";
 
 export default function ProductList() {
   const [, setLocation] = useLocation();
@@ -95,7 +96,7 @@ export default function ProductList() {
                       <SelectItem value="all">{t("products.category")}</SelectItem>
                       {categories.map((category) => (
                         <SelectItem key={category.id} value={category.id.toString()}>
-                          {category.name}
+                          {t(getCategoryTranslationKey(category.name))}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -114,7 +115,7 @@ export default function ProductList() {
                     setOffset(0);
                   }}
                 >
-                  清除篩選
+                  {t("products.clearFilters")}
                 </Button>
               )}
             </Card>
@@ -211,7 +212,7 @@ export default function ProductList() {
                       setOffset(0);
                     }}
                   >
-                    清除篩選
+                    {t("products.clearFilters")}
                   </Button>
                 )}
               </div>

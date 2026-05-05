@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Loader2, ShoppingBag, Plus } from "lucide-react";
 import { Link } from "wouter";
 import { useTranslation } from "react-i18next";
+import { getCategoryTranslationKey } from "@/lib/categoryTranslation";
 
 
 export default function Home() {
@@ -88,7 +89,7 @@ export default function Home() {
                 onClick={() => setSelectedCategory(undefined)}
                 className="whitespace-nowrap"
               >
-                全部商品
+                {t("home.allProducts")}
               </Button>
               {categories.map((category) => (
                 <Button
@@ -97,7 +98,7 @@ export default function Home() {
                   onClick={() => setSelectedCategory(category.id)}
                   className="whitespace-nowrap"
                 >
-                  {category.name}
+                  {t(getCategoryTranslationKey(category.name))}
                 </Button>
               ))}
             </div>
@@ -113,7 +114,7 @@ export default function Home() {
           </div>
         ) : products && products.length > 0 ? (
           <div>
-            <h2 className="text-3xl font-bold mb-8 text-foreground">精選商品</h2>
+            <h2 className="text-3xl font-bold mb-8 text-foreground">{t("home.featured")}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {products.map((product) => (
                 <Link key={product.id} href={`/products/${product.id}`}>

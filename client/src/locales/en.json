@@ -29,7 +29,19 @@
     "popular": "Most Popular",
     "priceAsc": "Price: Low to High",
     "priceDesc": "Price: High to Low",
-    "noResults": "No products found"
+    "noResults": "No products found",
+    "clearFilters": "Clear Filters",
+    "categories": {
+      "electronics": "Electronics",
+      "clothing": "Clothing",
+      "houseRelated": "House Related",
+      "automotive": "Automotive",
+      "machinery": "Machinery",
+      "sports": "Sports",
+      "furniture": "Furniture",
+      "houseRental": "Free Items",
+      "other": "Other"
+    }
   },
   "productDetail": {
     "price": "Price",
