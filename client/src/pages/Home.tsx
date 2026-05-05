@@ -43,8 +43,11 @@ export default function Home() {
               Marketplace
             </h1>
           </div>
-          <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-muted-foreground mb-2 max-w-2xl mx-auto">
             探索精選二手商品，發現生活中的隱藏寶藏。每件商品都有故事，每次交易都是新的開始。
+          </p>
+          <p className="text-sm md:text-base text-muted-foreground mb-8 max-w-2xl mx-auto italic">
+            Explore curated second-hand treasures. Unique stories, fresh starts.
           </p>
 
           <div className="flex gap-4 justify-center">
