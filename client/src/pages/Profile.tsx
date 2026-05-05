@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,7 @@ import { Loader2, ArrowLeft, LogOut } from "lucide-react";
 import { toast } from "sonner";
 
 export default function Profile() {
+  const { t } = useTranslation();
   const { user, isAuthenticated, logout } = useAuth();
   const [, navigate] = useLocation();
   const [isEditing, setIsEditing] = useState(false);
@@ -51,13 +53,13 @@ export default function Profile() {
   // Update profile mutation
   const updateProfileMutation = trpc.users.updateProfile.useMutation({
     onSuccess: async () => {
-      toast.success("檔案已更新");
+      toast.success(t("profile.updateSuccess"));
       setIsEditing(false);
       // Invalidate and refetch the profile data
       await utils.users.me.invalidate();
     },
     onError: (error) => {
-      toast.error(error.message || "更新失敗");
+      toast.error(error.message || t("profile.updateError"));
     },
   });
 
@@ -106,9 +108,9 @@ export default function Profile() {
             className="mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            返回
+            {t("common.back")}
           </Button>
-          <h1 className="text-3xl font-bold">個人檔案</h1>
+          <h1 className="text-3xl font-bold">{t("profile.title")}</h1>
         </div>
       </div>
 
@@ -116,34 +118,34 @@ export default function Profile() {
         <div className="max-w-2xl mx-auto space-y-6">
           {/* User Info Card */}
           <Card className="p-6">
-            <h2 className="text-xl font-bold mb-6">帳號資訊</h2>
+            <h2 className="text-xl font-bold mb-6">{t("profile.accountInfo")}</h2>
 
             <div className="space-y-4">
               <div>
-                <Label>名稱</Label>
-                <p className="mt-2 text-lg font-medium">{user?.name || "未設定"}</p>
+                <Label>{t("profile.name")}</Label>
+                <p className="mt-2 text-lg font-medium">{user?.name || t("profile.notSet")}</p>
               </div>
 
               <div>
-                <Label>電子郵件</Label>
-                <p className="mt-2 text-lg font-medium">{user?.email || "未設定"}</p>
+                <Label>{t("profile.email")}</Label>
+                <p className="mt-2 text-lg font-medium">{user?.email || t("profile.notSet")}</p>
               </div>
 
               <div>
-                <Label>帳號狀態</Label>
+                <Label>{t("profile.status")}</Label>
                 <p className="mt-2">
                   <span className="inline-block px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">
-                    正常
+                    {t("profile.active")}
                   </span>
                 </p>
               </div>
 
               <div>
-                <Label>加入日期</Label>
+                <Label>{t("profile.joinDate")}</Label>
                 <p className="mt-2 text-lg font-medium">
                   {user?.createdAt
                     ? new Date(user.createdAt).toLocaleDateString("zh-TW")
-                    : "未知"}
+                    : t("profile.unknown")}
                 </p>
               </div>
             </div>
@@ -152,13 +154,13 @@ export default function Profile() {
           {/* Profile Edit Card */}
           <Card className="p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold">個人資料</h2>
+              <h2 className="text-xl font-bold">{t("profile.personalInfo")}</h2>
               {!isEditing && (
                 <Button
                   variant="outline"
                   onClick={() => setIsEditing(true)}
                 >
-                  編輯
+                  {t("common.edit")}
                 </Button>
               )}
             </div>
@@ -166,11 +168,11 @@ export default function Profile() {
             {isEditing ? (
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <Label htmlFor="bio">個人簡介</Label>
+                  <Label htmlFor="bio">{t("profile.bio")}</Label>
                   <Textarea
                     id="bio"
                     name="bio"
-                    placeholder="介紹您自己..."
+                    placeholder={t("profile.bioPlaceholder")}
                     value={formData.bio}
                     onChange={handleInputChange}
                     rows={4}
@@ -179,12 +181,12 @@ export default function Profile() {
                 </div>
 
                 <div>
-                  <Label htmlFor="phone">電話</Label>
+                  <Label htmlFor="phone">{t("profile.phone")}</Label>
                   <Input
                     id="phone"
                     name="phone"
                     type="tel"
-                    placeholder="09xx-xxx-xxx"
+                    placeholder={t("profile.phonePlaceholder")}
                     value={formData.phone}
                     onChange={handleInputChange}
                     className="mt-2"
@@ -192,11 +194,11 @@ export default function Profile() {
                 </div>
 
                 <div>
-                  <Label htmlFor="address">地址</Label>
+                  <Label htmlFor="address">{t("profile.address")}</Label>
                   <Input
                     id="address"
                     name="address"
-                    placeholder="您的地址"
+                    placeholder={t("profile.addressPlaceholder")}
                     value={formData.address}
                     onChange={handleInputChange}
                     className="mt-2"
@@ -210,7 +212,7 @@ export default function Profile() {
                     onClick={() => setIsEditing(false)}
                     className="flex-1"
                   >
-                    取消
+                    {t("common.cancel")}
                   </Button>
                   <Button
                     type="submit"
@@ -220,10 +222,10 @@ export default function Profile() {
                     {updateProfileMutation.isPending ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        保存中...
+                        {t("common.saving")}
                       </>
                     ) : (
-                      "保存"
+                      t("common.save")
                     )}
                   </Button>
                 </div>
@@ -231,23 +233,23 @@ export default function Profile() {
             ) : (
               <div className="space-y-4">
                 <div>
-                  <Label>個人簡介</Label>
+                  <Label>{t("profile.bio")}</Label>
                   <p className="mt-2 text-muted-foreground">
-                    {profileData?.profile?.bio || "未設定"}
+                    {profileData?.profile?.bio || t("profile.notSet")}
                   </p>
                 </div>
 
                 <div>
-                  <Label>電話</Label>
+                  <Label>{t("profile.phone")}</Label>
                   <p className="mt-2 text-muted-foreground">
-                    {profileData?.profile?.phone || "未設定"}
+                    {profileData?.profile?.phone || t("profile.notSet")}
                   </p>
                 </div>
 
                 <div>
-                  <Label>地址</Label>
+                  <Label>{t("profile.address")}</Label>
                   <p className="mt-2 text-muted-foreground">
-                    {profileData?.profile?.address || "未設定"}
+                    {profileData?.profile?.address || t("profile.notSet")}
                   </p>
                 </div>
               </div>
@@ -256,14 +258,14 @@ export default function Profile() {
 
           {/* Quick Links */}
           <Card className="p-6">
-            <h2 className="text-xl font-bold mb-4">快速連結</h2>
+            <h2 className="text-xl font-bold mb-4">{t("profile.quickLinks")}</h2>
             <div className="space-y-2">
               <Button
                 variant="outline"
                 className="w-full justify-start"
                 onClick={() => navigate("/my-products")}
               >
-                我的商品
+                {t("nav.myProducts")}
               </Button>
               <Button
                 variant="outline"
@@ -271,7 +273,7 @@ export default function Profile() {
                 onClick={handleLogout}
               >
                 <LogOut className="w-4 h-4 mr-2" />
-                登出
+                {t("common.logout")}
               </Button>
             </div>
           </Card>
