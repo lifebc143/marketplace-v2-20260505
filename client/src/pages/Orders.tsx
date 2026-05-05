@@ -49,320 +49,231 @@ export default function Orders() {
     return (
       <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
         <div className="text-center">
-          <p className="text-lg text-muted-foreground mb-4">請先登錄以查看訂單</p>
-          <Button onClick={() => navigate("/")}>返回首頁</Button>
+          <h2 className="text-2xl font-bold mb-4">{t("orders.loginRequired")}</h2>
+          <Button onClick={() => navigate("/")}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            {t("common.backHome")}
+          </Button>
         </div>
       </div>
     );
   }
 
-  const handleConfirmOrder = async () => {
-    if (!selectedOrderId) return;
-
-    try {
-      await confirmOrderMutation.mutateAsync({ id: selectedOrderId });
-      toast.success("訂單已確認");
-      setSelectedOrderId(null);
-    } catch (error) {
-      console.error("Failed to confirm order:", error);
-      toast.error("確認訂單失敗，請重試");
-    }
-  };
-
-  const getStatusLabel = (status: string) => {
-    const statusMap: Record<string, { label: string; color: string; icon: any }> = {
-      pending: { label: "待發貨", color: "text-yellow-500", icon: Clock },
-      confirmed: { label: "已確認", color: "text-blue-500", icon: CheckCircle },
-      shipped: { label: "已發貨", color: "text-blue-500", icon: Package },
-      delivered: { label: "已送達", color: "text-green-500", icon: CheckCircle },
-      cancelled: { label: "已取消", color: "text-red-500", icon: XCircle },
-    };
-    return statusMap[status] || { label: "未知", color: "text-gray-500", icon: Clock };
-  };
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-accent" />
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4 text-red-500">{t("common.error")}</h2>
+          <p className="text-gray-400 mb-4">{error.message}</p>
+          <Button onClick={() => navigate("/")}>{t("common.backHome")}</Button>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Header */}
-      <div className="border-b border-border">
-        <div className="container py-4">
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center mb-8">
           <Button
             variant="ghost"
+            size="sm"
             onClick={() => navigate("/")}
-            className="mb-4"
+            className="mr-4"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            返回首頁
+            <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-3xl font-bold">我的訂單</h1>
+          <h1 className="text-3xl font-bold">{t("orders.title")}</h1>
         </div>
-      </div>
 
-      <div className="container py-8">
-        {error ? (
-          <Card className="p-6 text-center">
-            <p className="text-muted-foreground mb-4">無法載入訂單列表</p>
-            <Button
-              variant="outline"
-              onClick={() => window.location.reload()}
-            >
-              重新整理
-            </Button>
-          </Card>
-        ) : !orders || orders.length === 0 ? (
-          <Card className="p-12 text-center">
-            <Package className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-            <p className="text-lg text-muted-foreground mb-4">您還沒有訂單</p>
-            <Button
-              className="bg-accent hover:bg-accent/90"
-              onClick={() => navigate("/products")}
-            >
-              開始購物
-            </Button>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Orders List */}
-            <div className="lg:col-span-2 space-y-4">
-              {orders.map((order: any) => {
-                const statusInfo = getStatusLabel(order.status);
-                const StatusIcon = statusInfo.icon;
-                const productImage = order.product?.images?.[0]?.imageUrl;
-
-                return (
-                  <Card
-                    key={order.id}
-                    className="p-6 cursor-pointer hover:shadow-lg transition-shadow"
-                    onClick={() => setSelectedOrderId(order.id)}
-                  >
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <h3 className="font-bold text-lg">訂單 #{order.id}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          {new Date(order.createdAt).toLocaleDateString("zh-TW")}
-                        </p>
-                      </div>
-                      <div className={`flex items-center gap-2 ${statusInfo.color}`}>
-                        <StatusIcon className="w-4 h-4" />
-                        <span className="text-sm font-medium">{statusInfo.label}</span>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* 訂單列表 */}
+          <div className="lg:col-span-1">
+            <Card className="p-4">
+              <h2 className="text-xl font-bold mb-4">{t("orders.myOrders")}</h2>
+              <div className="space-y-2 max-h-96 overflow-y-auto">
+                {orders && orders.length > 0 ? (
+                  orders.map((order: any) => (
+                    <div
+                      key={order.id}
+                      onClick={() => setSelectedOrderId(order.id)}
+                      className={`p-3 rounded cursor-pointer transition ${
+                        selectedOrderId === order.id
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted hover:bg-muted/80"
+                      }`}
+                    >
+                      <div className="font-semibold">#{order.id}</div>
+                      <div className="text-sm opacity-75">
+                        {new Date(order.createdAt).toLocaleDateString()}
                       </div>
                     </div>
+                  ))
+                ) : (
+                  <p className="text-muted-foreground">{t("orders.noOrders")}</p>
+                )}
+              </div>
+            </Card>
+          </div>
 
-                    {/* Product Image and Info */}
-                    {order.product && (
-                      <div className="flex gap-4 mb-4 pb-4 border-b border-border">
-                        {productImage && (
-                          <div className="flex-shrink-0">
-                            <img
-                              src={productImage}
-                              alt={order.product.title}
-                              className="w-24 h-24 object-cover rounded-lg"
-                            />
-                          </div>
+          {/* 訂單詳情 */}
+          <div className="lg:col-span-2">
+            {selectedOrder ? (
+              <Card className="p-6">
+                <h2 className="text-2xl font-bold mb-6">{t("orders.orderDetails")}</h2>
+
+                {/* 訂單基本信息 */}
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold mb-4">{t("orders.basicInfo")}</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm text-muted-foreground">{t("orders.orderId")}</label>
+                      <p className="font-semibold">#{selectedOrder.id}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm text-muted-foreground">{t("orders.status")}</label>
+                      <div className="flex items-center gap-2 mt-1">
+                        {selectedOrder.status === "pending" && (
+                          <>
+                            <Clock className="h-4 w-4 text-yellow-500" />
+                            <span className="font-semibold text-yellow-500">{t("orders.pending")}</span>
+                          </>
                         )}
-                        <div className="flex-1">
-                          <p className="font-semibold text-base line-clamp-2">
-                            {order.product.title}
-                          </p>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            NT${(order.product.price / 100).toFixed(0)}
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-2">
-                            狀態：{order.product.condition === 'like_new' ? '如新' : order.product.condition === 'good' ? '良好' : '尚可'}
-                          </p>
-                        </div>
+                        {selectedOrder.status === "confirmed" && (
+                          <>
+                            <CheckCircle className="h-4 w-4 text-green-500" />
+                            <span className="font-semibold text-green-500">{t("orders.confirmed")}</span>
+                          </>
+                        )}
+                        {selectedOrder.status === "cancelled" && (
+                          <>
+                            <XCircle className="h-4 w-4 text-red-500" />
+                            <span className="font-semibold text-red-500">{t("orders.cancelled")}</span>
+                          </>
+                        )}
                       </div>
-                    )}
-
-                    <div className="space-y-2 mb-4 pb-4 border-b border-border">
-                      <p className="text-sm">
-                        <span className="text-muted-foreground">收件人：</span>
-                        <span className="font-medium">{order.recipientName || "N/A"}</span>
-                      </p>
-                      <p className="text-sm">
-                        <span className="text-muted-foreground">電話：</span>
-                        <span className="font-medium">{order.recipientPhone || "N/A"}</span>
-                      </p>
-                      <p className="text-sm">
-                        <span className="text-muted-foreground">地址：</span>
-                        <span className="font-medium line-clamp-1">{order.recipientAddress || "N/A"}</span>
+                    </div>
+                    <div>
+                      <label className="text-sm text-muted-foreground">{t("orders.createdDate")}</label>
+                      <p className="font-semibold">
+                        {new Date(selectedOrder.createdAt).toLocaleDateString()}
                       </p>
                     </div>
-
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">訂單總額</span>
-                      <span className="text-2xl font-bold text-accent">
-                        NT${(order.totalPrice / 100).toFixed(0)}
-                      </span>
+                    <div>
+                      <label className="text-sm text-muted-foreground">{t("orders.totalPrice")}</label>
+                      <p className="font-semibold text-lg">NT${selectedOrder.totalPrice}</p>
                     </div>
-                  </Card>
-                );
-              })}
-            </div>
+                  </div>
+                </div>
 
-            {/* Order Details */}
-            {selectedOrder && (
-              <div className="lg:col-span-1">
-                <Card className="p-6 sticky top-4">
-                  <h2 className="text-xl font-bold mb-4">訂單詳情</h2>
-
-                  {/* Product Details */}
-                  {(selectedOrder as any).product && (
-                    <div className="mb-6 pb-6 border-b border-border">
-                      <p className="text-xs text-muted-foreground mb-3 font-semibold">商品信息</p>
-                      {(selectedOrder as any).product.images?.[0]?.imageUrl && (
+                {/* 商品信息 */}
+                {selectedOrder.product && (
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold mb-4">{t("orders.productInfo")}</h3>
+                    <div className="flex gap-4">
+                      {selectedOrder.product.images && selectedOrder.product.images.length > 0 && (
                         <img
-                          src={(selectedOrder as any).product.images[0].imageUrl}
-                          alt={(selectedOrder as any).product.title}
-                          className="w-full h-32 object-cover rounded-lg mb-3"
+                          src={selectedOrder.product.images[0].imageUrl}
+                          alt={selectedOrder.product.title}
+                          className="w-24 h-24 object-cover rounded"
                         />
                       )}
-                      <p className="font-semibold text-sm mb-2">
-                        {(selectedOrder as any).product.title}
-                      </p>
-                      <p className="text-sm text-accent font-bold mb-2">
-                        NT${((selectedOrder as any).product.price / 100).toFixed(0)}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        狀態：{(selectedOrder as any).product.condition === 'like_new' ? '如新' : (selectedOrder as any).product.condition === 'good' ? '良好' : '尚可'}
-                      </p>
-                      {(selectedOrder as any).product.description && (
-                        <p className="text-xs text-muted-foreground mt-2 line-clamp-3">
-                          {(selectedOrder as any).product.description}
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-lg">{selectedOrder.product.title}</h4>
+                        <p className="text-muted-foreground text-sm mb-2">
+                          {selectedOrder.product.description}
                         </p>
-                      )}
-                    </div>
-                  )}
-
-                  <div className="space-y-4 mb-6 pb-6 border-b border-border">
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">訂單編號</p>
-                      <p className="font-medium">#{selectedOrder.id}</p>
-                    </div>
-
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">訂單狀態</p>
-                      <div className={`flex items-center gap-2 ${getStatusLabel(selectedOrder.status).color}`}>
-                        {(() => {
-                          const Icon = getStatusLabel(selectedOrder.status).icon;
-                          return <Icon className="w-4 h-4" />;
-                        })()}
-                        <span className="font-medium">{getStatusLabel(selectedOrder.status).label}</span>
+                        <p className="font-semibold">NT${selectedOrder.product.price}</p>
                       </div>
                     </div>
+                  </div>
+                )}
 
+                {/* 收件人信息 */}
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold mb-4">{t("orders.recipientInfo")}</h3>
+                  <div className="grid grid-cols-1 gap-4">
                     <div>
-                      <p className="text-xs text-muted-foreground mb-1">訂單日期</p>
-                      <p className="font-medium">
-                        {new Date(selectedOrder.createdAt).toLocaleDateString("zh-TW")}
-                      </p>
+                      <label className="text-sm text-muted-foreground">{t("orders.recipientName")}</label>
+                      <p className="font-semibold">{selectedOrder.recipientName || "N/A"}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm text-muted-foreground">{t("orders.recipientPhone")}</label>
+                      <p className="font-semibold">{selectedOrder.recipientPhone || "N/A"}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm text-muted-foreground">{t("orders.recipientAddress")}</label>
+                      <p className="font-semibold">{selectedOrder.recipientAddress || "N/A"}</p>
                     </div>
                   </div>
+                </div>
 
-                  <div className="space-y-4 mb-6 pb-6 border-b border-border">
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">收件人</p>
-                      <p className="font-medium">{selectedOrder.recipientName || "N/A"}</p>
-                    </div>
-
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">電話</p>
-                      <p className="font-medium">{selectedOrder.recipientPhone || "N/A"}</p>
-                    </div>
-
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">地址</p>
-                      <p className="font-medium text-sm">{selectedOrder.recipientAddress || "N/A"}</p>
-                    </div>
-
-                    {selectedOrder.notes && (
+                {/* 賣家信息 */}
+                {sellerInfo && (
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold mb-4">{t("orders.sellerInfo")}</h3>
+                    <div className="grid grid-cols-1 gap-4">
                       <div>
-                        <p className="text-xs text-muted-foreground mb-1">備註</p>
-                        <p className="font-medium text-sm">{selectedOrder.notes}</p>
+                        <label className="text-sm text-muted-foreground">{t("orders.sellerName")}</label>
+                        <p className="font-semibold">{"N/A"}</p>
                       </div>
-                    )}
-                  </div>
-
-                  <div className="mb-6 pb-6 border-b border-border">
-                    <p className="text-xs text-muted-foreground mb-2">訂單總額</p>
-                    <p className="text-3xl font-bold text-accent">
-                      NT${(selectedOrder.totalPrice / 100).toFixed(0)}
-                    </p>
-                  </div>
-
-                  {/* 賣家信息 */}
-                  {sellerInfo && (
-                    <div className="mb-6 pb-6 border-b border-border">
-                      <p className="text-xs text-muted-foreground mb-3">賣家聯絡信息：</p>
-                      <div className="space-y-2">
-                        <div>
-                          <p className="text-xs text-muted-foreground">電話</p>
-                          <p className="font-medium text-sm">{sellerInfo.phone}</p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-muted-foreground">地址</p>
-                          <p className="font-medium text-sm">{sellerInfo.address}</p>
-                        </div>
+                      <div>
+                        <label className="text-sm text-muted-foreground">{t("orders.sellerPhone")}</label>
+                        <p className="font-semibold">{sellerInfo.phone || "N/A"}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm text-muted-foreground">{t("orders.sellerAddress")}</label>
+                        <p className="font-semibold">{sellerInfo.address || "N/A"}</p>
                       </div>
                     </div>
-                  )}
-
-                  <div className="bg-secondary/10 rounded-lg p-3 mb-6 border border-border">
-                    <p className="text-xs font-bold text-foreground mb-2">重要提示：</p>
-                    <ul className="text-xs text-muted-foreground space-y-1 ml-3">
-                      <li>本訂單為個人交易行為</li>
-                      <li>網站不涉及任何金流</li>
-                      <li>請與賣家直接聯繫</li>
-                      <li>交易安全由雙方負責</li>
-                    </ul>
                   </div>
+                )}
 
-                  <div className="space-y-2">
-                    {selectedOrder.status === "shipped" && (
-                      <Button
-                        className="w-full bg-accent hover:bg-accent/90"
-                        onClick={handleConfirmOrder}
-                        disabled={confirmOrderMutation.isPending}
-                      >
-                        {confirmOrderMutation.isPending ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            確認中...
-                          </>
-                        ) : (
-                          "確認收貨"
-                        )}
-                      </Button>
-                    )}
-                    
+                {/* 操作按鈕 */}
+                <div className="flex gap-4 pt-6 border-t">
+                  {selectedOrder.status === "pending" && (
                     <Button
-                      variant="outline"
-                      className="w-full"
-                      onClick={handleContactSeller}
-                      disabled={contactSellerMutation.isPending}
+                      onClick={() => {
+                        confirmOrderMutation.mutateAsync({ id: selectedOrder.id });
+                      }}
+                      disabled={confirmOrderMutation.isPending}
+                      className="flex-1"
                     >
-                      {contactSellerMutation.isPending ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          發送中...
-                        </>
-                      ) : (
-                        "聯絡賣家"
+                      {confirmOrderMutation.isPending && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       )}
+                      {t("orders.confirmOrder")}
                     </Button>
-                  </div>
-                </Card>
-              </div>
+                  )}
+                  <Button
+                    variant="outline"
+                    onClick={handleContactSeller}
+                    disabled={contactSellerMutation.isPending}
+                    className="flex-1"
+                  >
+                    {contactSellerMutation.isPending && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    {t("orders.contactSeller")}
+                  </Button>
+                </div>
+              </Card>
+            ) : (
+              <Card className="p-6 text-center">
+                <Package className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                <p className="text-muted-foreground">{t("orders.selectOrder")}</p>
+              </Card>
             )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

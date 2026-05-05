@@ -226,9 +226,9 @@ export const ordersRouter = router({
               sellerId: order.sellerId,
               productId: order.productId,
               orderId: order.id,
-              lastMessageAt: new Date(),
+              lastMessageAt: new Date().toISOString(),
             });
-            conversationId = (result as any)?.insertId ?? (result as any)?.[0]?.insertId;
+            conversationId = (result as any)?.insertId ?? (result as any)?.[0]?.insertId ?? 0;
           } else {
             conversationId = conversation[0].id;
           }

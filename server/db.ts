@@ -1,4 +1,4 @@
-import { eq, or, and, like, desc, sql } from "drizzle-orm";
+import { eq, or, and, like, desc, sql, isNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, users, categories, userProfiles, products, productImages, InsertUserProfile, InsertProduct, InsertProductImage, orders, orderItems, InsertOrder, InsertOrderItem, reviews, InsertReview, Review, conversations, InsertConversation, Conversation, messages, InsertMessage, Message, notifications, InsertNotification, Notification } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -61,11 +61,11 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     }
 
     if (!values.lastSignedIn) {
-      values.lastSignedIn = new Date();
+      values.lastSignedIn = new Date().toISOString();
     }
 
     if (Object.keys(updateSet).length === 0) {
-      updateSet.lastSignedIn = new Date();
+      updateSet.lastSignedIn = new Date().toISOString();
     }
 
     await db.insert(users).values(values).onDuplicateKeyUpdate({
@@ -502,14 +502,20 @@ export async function createConversation(data: InsertConversation) {
 
   try {
     // Check if conversation already exists
+    const conditions = [
+      eq(conversations.buyerId, data.buyerId),
+      eq(conversations.sellerId, data.sellerId),
+    ];
+    
+    // Handle productId comparison (null-safe)
+    if (data.productId === null || data.productId === undefined) {
+      conditions.push(isNull(conversations.productId));
+    } else {
+      conditions.push(eq(conversations.productId, data.productId as number));
+    }
+    
     const existing = await db.select().from(conversations)
-      .where(
-        and(
-          eq(conversations.buyerId, data.buyerId),
-          eq(conversations.sellerId, data.sellerId),
-          eq(conversations.productId, data.productId)
-        )
-      )
+      .where(and(...(conditions as any)))
       .limit(1);
 
     if (existing.length > 0) {
@@ -520,14 +526,19 @@ export async function createConversation(data: InsertConversation) {
     const insertedId = (result as any)?.insertId || (result as any)?.[0]?.id;
 
     if (!insertedId) {
+      const insertedConditions = [
+        eq(conversations.buyerId, data.buyerId),
+        eq(conversations.sellerId, data.sellerId),
+      ];
+      
+      if (data.productId === null || data.productId === undefined) {
+        insertedConditions.push(isNull(conversations.productId));
+      } else {
+        insertedConditions.push(eq(conversations.productId, data.productId as number));
+      }
+      
       const inserted = await db.select().from(conversations)
-        .where(
-          and(
-            eq(conversations.buyerId, data.buyerId),
-            eq(conversations.sellerId, data.sellerId),
-            eq(conversations.productId, data.productId)
-          )
-        )
+        .where(and(...(insertedConditions as any)))
         .limit(1);
 
       if (inserted.length === 0) {
@@ -762,9 +773,9 @@ export async function deleteNotification(notificationId: number) {
 /**
  * Additional message queries
  */
-export async function getOrCreateConversation(buyerId: number, sellerId: number, productId: number) {
+export async function getOrCreateConversation(buyerId: number, sellerId: number, productId?: number | null) {
   // This is already handled by createConversation
-  return createConversation({ buyerId, sellerId, productId });
+  return createConversation({ buyerId, sellerId, productId: productId ?? null });
 }
 
 export async function getUserConversations(userId: number) {

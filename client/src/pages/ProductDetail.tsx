@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -12,6 +13,7 @@ export default function ProductDetail() {
   const params = useParams();
   const [, navigate] = useLocation();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   
   const productId = params?.id ? parseInt(params.id) : null;
@@ -35,13 +37,13 @@ export default function ProductDetail() {
     return (
       <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
         <div className="text-center">
-          <p className="text-lg text-muted-foreground">商品不存在</p>
+          <p className="text-lg text-muted-foreground">{t("common.error")}</p>
           <Button
             variant="outline"
             className="mt-4"
             onClick={() => navigate("/products")}
           >
-            返回商品列表
+            {t("common.back")}
           </Button>
         </div>
       </div>
@@ -60,12 +62,12 @@ export default function ProductDetail() {
     return (
       <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
         <div className="text-center">
-          <p className="text-lg text-muted-foreground mb-4">無法載入商品</p>
+          <p className="text-lg text-muted-foreground mb-4">{t("common.error")}</p>
           <Button
             variant="outline"
             onClick={() => navigate("/products")}
           >
-            返回商品列表
+            {t("common.back")}
           </Button>
         </div>
       </div>

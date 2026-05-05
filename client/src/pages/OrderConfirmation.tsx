@@ -258,7 +258,7 @@ export default function OrderConfirmation() {
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center gap-2">
                       <User className="w-4 h-4 text-muted-foreground" />
-                      <span>{sellerInfo.name || "賣家"}</span>
+                      <span>{"賣家"}</span>
                     </div>
                     {sellerInfo.phone && (
                       <div className="flex items-center gap-2">

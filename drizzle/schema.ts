@@ -144,6 +144,14 @@ export const notifications = mysqlTable("notifications", {
 });
 
 // Type exports for insert operations
+export type InsertUser = typeof users.$inferInsert;
+export type User = typeof users.$inferSelect;
+export type InsertUserProfile = typeof userProfiles.$inferInsert;
+export type UserProfile = typeof userProfiles.$inferSelect;
+export type InsertProduct = typeof products.$inferInsert;
+export type Product = typeof products.$inferSelect;
+export type InsertProductImage = typeof productImages.$inferInsert;
+export type ProductImage = typeof productImages.$inferSelect;
 export type InsertOrder = typeof orders.$inferInsert;
 export type Order = typeof orders.$inferSelect;
 export type InsertOrderItem = typeof orderItems.$inferInsert;

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -12,6 +13,7 @@ import { toast } from "sonner";
 export default function Checkout() {
   const [, navigate] = useLocation();
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   // 從 URL 查詢參數中獲取商品 ID 和數量
   const urlParams = new URLSearchParams(window.location.search);
@@ -42,8 +44,8 @@ export default function Checkout() {
     return (
       <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
         <div className="text-center">
-          <p className="text-lg text-muted-foreground mb-4">請先登錄以繼續購買</p>
-          <Button onClick={() => navigate("/")}>返回首頁</Button>
+          <p className="text-lg text-muted-foreground mb-4">{t("checkout.title")}</p>
+          <Button onClick={() => navigate("/")}>{t("common.backHome")}</Button>
         </div>
       </div>
     );
@@ -61,8 +63,8 @@ export default function Checkout() {
     return (
       <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
         <div className="text-center">
-          <p className="text-lg text-muted-foreground mb-4">商品不存在</p>
-          <Button onClick={() => navigate("/products")}>返回商品列表</Button>
+          <p className="text-lg text-muted-foreground mb-4">{t("common.error")}</p>
+          <Button onClick={() => navigate("/products")}>{t("common.back")}</Button>
         </div>
       </div>
     );
