@@ -1,48 +1,74 @@
 /**
  * Category translation mapping utility
- * Maps category names to translation keys for i18n support
+ * Maps category names to display names for i18n support
  */
 
-export const categoryNameToKeyMap: Record<string, string> = {
-  // Database category names - English with Chinese
-  "Electronics -電子產品": "products.categories.electronics",
-  "House Related 房屋用品": "products.categories.houseRelated",
-  "運動用品": "products.categories.sports",
-  "免費商品": "products.categories.houseRental",
-  "房屋租賃": "products.categories.houseRental",
-  "飾品": "products.categories.other",
-  "分類廣告": "products.categories.other",
-  "找工作": "products.categories.other",
-  "相親-男女": "products.categories.other",
-  "其他類別": "products.categories.other",
-  "辦公用品": "products.categories.other",
-  "寵物": "products.categories.other",
-  "門禁設備": "products.categories.other",
-  "汽車類": "products.categories.automotive",
-  "機車": "products.categories.automotive",
+// Map of category names to their display names (supports both Chinese and English)
+export const categoryDisplayNameMap: Record<string, string> = {
+  // Electronics
+  "Electronics -電子產品": "電子產品",
+  "Electronics": "電子產品",
   
-  // Fallback Chinese names
-  "電子產品": "products.categories.electronics",
-  "服飾": "products.categories.clothing",
-  "家居": "products.categories.houseRelated",
+  // House Related
+  "House Related 房屋用品": "家居",
+  "House Related": "家居",
+  "房屋用品": "家居",
   
-  // English names (fallback)
-  "Electronics": "products.categories.electronics",
-  "Clothing": "products.categories.clothing",
-  "House Related": "products.categories.houseRelated",
+  // Clothing
+  "服飾": "服飾",
+  "Clothing": "服飾",
+  
+  // Sports
+  "運動用品": "運動用品",
+  "Sports": "運動用品",
+  
+  // Free Items
+  "免費商品": "免費商品",
+  "Free Items": "免費商品",
+  
+  // Automotive
+  "汽車類": "汽車相關",
+  "汽車相關": "汽車相關",
+  "Automotive": "汽車相關",
+  "機車": "機車",
+  
+  // Accessories
+  "飾品": "飾品",
+  "Accessories": "飾品",
+  
+  // House Rental
+  "房屋租賃": "房屋租賃",
+  "House Rental": "房屋租賃",
+  
+  // Others - keep original names
+  "分類廣告": "分類廣告",
+  "找工作": "找工作",
+  "相親-男女": "相親-男女",
+  "其他類別": "其他類別",
+  "辦公用品": "辦公用品",
+  "寵物": "寵物",
+  "門禁設備": "門禁設備",
 };
 
 /**
- * Get translation key for a category name
+ * Get display name for a category
+ * If no mapping exists, return the original name
+ * @param categoryName - The category name from database
+ * @returns The display name
+ */
+export function getCategoryDisplayName(categoryName: string): string {
+  return categoryDisplayNameMap[categoryName] || categoryName;
+}
+
+/**
+ * Get translation key for a category name (for backward compatibility)
  * @param categoryName - The category name from database
  * @returns The i18n translation key
  */
 export function getCategoryTranslationKey(categoryName: string): string {
-  const key = categoryNameToKeyMap[categoryName];
-  if (!key) {
-    console.warn(`Category "${categoryName}" not found in translation map`);
-  }
-  return key || "products.categories.other";
+  // Return the display name directly - it will be shown as-is
+  // This allows all categories to display properly without needing translation keys
+  return getCategoryDisplayName(categoryName);
 }
 
 /**
@@ -50,5 +76,5 @@ export function getCategoryTranslationKey(categoryName: string): string {
  * @returns Array of all translation keys
  */
 export function getAllCategoryKeys(): string[] {
-  return Object.values(categoryNameToKeyMap);
+  return Object.values(categoryDisplayNameMap);
 }

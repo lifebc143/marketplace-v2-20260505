@@ -83,7 +83,7 @@ export default function Home() {
       {categories && categories.length > 0 && (
         <div className="border-b border-border bg-card/50 backdrop-blur sticky top-0 z-40">
           <div className="container py-4">
-            <div className="flex gap-2 overflow-x-auto pb-2">
+            <div className="flex gap-2 flex-wrap">
               <Button
                 variant={selectedCategory === undefined ? "default" : "outline"}
                 onClick={() => setSelectedCategory(undefined)}
