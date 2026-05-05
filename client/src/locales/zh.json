@@ -13,10 +13,13 @@
     "tagline": "探索精選二手商品，發現生活中的隱藏寶藏。每件商品都有故事，每次交易都是新的開始。",
     "taglineEn": "Explore curated second-hand treasures. Unique stories, fresh starts.",
     "uploadProduct": "上架商品",
-    "loginToSell": "登入開始銷售",
-    "browseAll": "瀏覽所有商品",
+    "loginToSell": "登入開始銷売",
+    "browseAll": "瘀覽所有商品",
     "allProducts": "全部商品",
-    "featured": "精選商品"
+    "featured": "精選商品",
+    "ctaTitle": "準備好開始了嘗？",
+    "ctaDescription": "加入我們的社群，買賣二手商品，創造循環經濟。",
+    "register": "立即註冊"
   },
   "products": {
     "title": "商品列表",
@@ -55,10 +58,11 @@
   },
   "myProducts": {
     "title": "我的商品",
+    "subtitle": "管理您上架的所有商品",
     "noProducts": "您還沒有上架任何商品",
     "edit": "編輯",
     "delete": "下架",
-    "deleteConfirm": "確定要下架此商品嗎？",
+    "deleteConfirm": "確定要下架此商品嘗？",
     "deleteSuccess": "商品已下架"
   },
   "orders": {
@@ -166,6 +170,7 @@
     "logout": "登出",
     "next": "下一步",
     "previous": "上一步",
-    "language": "語言"
+    "language": "語言",
+    "view": "查看"
   }
 }

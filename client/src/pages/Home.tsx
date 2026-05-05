@@ -168,9 +168,9 @@ export default function Home() {
       {/* CTA Section */}
       <div className="bg-gradient-to-r from-primary to-accent/50 py-16 text-center">
         <div className="container">
-          <h2 className="text-3xl font-bold mb-4 text-white">準備好開始了嗎？</h2>
+          <h2 className="text-3xl font-bold mb-4 text-white">{t("home.ctaTitle")}</h2>
           <p className="text-lg text-white/80 mb-8">
-            加入我們的社群，買賣二手商品，創造循環經濟。
+            {t("home.ctaDescription")}
           </p>
           {!isAuthenticated && (
             <Button
@@ -178,7 +178,7 @@ export default function Home() {
               className="bg-white text-primary hover:bg-white/90"
               onClick={() => (window.location.href = getLoginUrl())}
             >
-              立即註冊
+              {t("home.register")}
             </Button>
           )}
         </div>

@@ -16,7 +16,10 @@
     "loginToSell": "Login to Start Selling",
     "browseAll": "Browse All Products",
     "allProducts": "All Products",
-    "featured": "Featured Products"
+    "featured": "Featured Products",
+    "ctaTitle": "Ready to Get Started?",
+    "ctaDescription": "Join our community to buy and sell second-hand items and create a circular economy.",
+    "register": "Register Now"
   },
   "products": {
     "title": "Products",
@@ -55,11 +58,12 @@
   },
   "myProducts": {
     "title": "My Products",
-    "noProducts": "You haven't uploaded any products yet",
+    "subtitle": "Manage all your listed products",
+    "noProducts": "You don't have any products listed yet",
     "edit": "Edit",
-    "delete": "Delete",
-    "deleteConfirm": "Are you sure you want to delete this product?",
-    "deleteSuccess": "Product deleted successfully"
+    "delete": "Delist",
+    "deleteConfirm": "Are you sure you want to delist this product?",
+    "deleteSuccess": "Product delisted successfully"
   },
   "orders": {
     "title": "My Orders",
@@ -166,6 +170,7 @@
     "logout": "Logout",
     "next": "Next",
     "previous": "Previous",
-    "language": "Language"
+    "language": "Language",
+    "view": "View"
   }
 }

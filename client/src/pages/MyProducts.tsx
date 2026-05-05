@@ -7,8 +7,10 @@ import { Card } from "@/components/ui/card";
 import { Loader2, ShoppingBag, Plus, Edit2, Trash2, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 
 export default function MyProducts() {
+  const { t } = useTranslation();
   const { user, isAuthenticated } = useAuth();
   const [, navigate] = useLocation();
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -34,16 +36,16 @@ export default function MyProducts() {
   // Delist product mutation
   const delistMutation = trpc.products.delist.useMutation({
     onSuccess: () => {
-      toast.success("商品已下架");
+      toast.success(t("myProducts.deleteSuccess"));
       refetch();
     },
     onError: (error) => {
-      toast.error(error.message || "下架失敗");
+      toast.error(error.message || t("common.error"));
     },
   });
 
   const handleDelist = async (productId: number) => {
-    if (confirm("確定要下架此商品嗎？")) {
+    if (confirm(t("myProducts.deleteConfirm"))) {
       await delistMutation.mutateAsync({ id: productId });
     }
   };
@@ -63,19 +65,19 @@ export default function MyProducts() {
             className="mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            返回
+            {t("common.back")}
           </Button>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold">我的商品</h1>
+              <h1 className="text-3xl font-bold">{t("myProducts.title")}</h1>
               <p className="text-muted-foreground mt-2">
-                管理您上架的所有商品
+                {t("myProducts.subtitle") || "管理您上架的所有商品"}
               </p>
             </div>
             <Link href="/products/create">
               <Button className="bg-accent hover:bg-accent/90 text-accent-foreground">
                 <Plus className="w-4 h-4 mr-2" />
-                上架新商品
+                {t("home.uploadProduct")}
               </Button>
             </Link>
           </div>
@@ -148,9 +150,9 @@ export default function MyProducts() {
 
                     <div className="flex items-center justify-between text-sm text-muted-foreground">
                       <div className="space-x-4">
-                        <span>{product.views} 次瀏覽</span>
+                        <span>{product.views} {t("productDetail.views") || "次浏覽"}</span>
                         <span>
-                          發布於{" "}
+                          {t("productDetail.addedDate")}{" "}
                           {new Date(product.createdAt).toLocaleDateString(
                             "zh-TW"
                           )}
@@ -168,7 +170,7 @@ export default function MyProducts() {
                                 className="gap-2"
                               >
                                 <Edit2 className="w-4 h-4" />
-                                編輯
+                                {t("common.edit")}
                               </Button>
                             </Link>
                             <Button
@@ -179,13 +181,13 @@ export default function MyProducts() {
                               disabled={delistMutation.isPending}
                             >
                               <Trash2 className="w-4 h-4" />
-                              下架
+                              {t("myProducts.delete")}
                             </Button>
                           </>
                         )}
                         <Link href={`/products/${product.id}`}>
                           <Button size="sm" variant="outline">
-                            查看
+                            {t("common.view") || "查看"}
                           </Button>
                         </Link>
                       </div>
@@ -199,12 +201,12 @@ export default function MyProducts() {
           <div className="text-center py-20">
             <ShoppingBag className="w-16 h-16 text-muted-foreground mx-auto mb-4 opacity-50" />
             <p className="text-lg text-muted-foreground mb-6">
-              您還沒有上架任何商品
+              {t("myProducts.noProducts")}
             </p>
             <Link href="/products/create">
               <Button className="bg-accent hover:bg-accent/90 text-accent-foreground">
                 <Plus className="w-4 h-4 mr-2" />
-                立即上架商品
+                {t("home.uploadProduct")}
               </Button>
             </Link>
           </div>
