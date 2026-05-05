@@ -16,10 +16,13 @@ import {
 } from "@/components/ui/select";
 import { Loader2, Upload, ArrowLeft, X } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
+import { getCategoryTranslationKey } from "@/lib/categoryTranslation";
 
 export default function EditProduct() {
   const { user, isAuthenticated } = useAuth();
   const [, navigate] = useLocation();
+  const { t, i18n } = useTranslation();
   const params = useParams();
   const productId = params.id ? parseInt(params.id) : null;
 
@@ -281,7 +284,7 @@ export default function EditProduct() {
                     <SelectContent>
                       {categories?.map((cat) => (
                         <SelectItem key={cat.id} value={String(cat.id)}>
-                          {cat.name}
+                          {getCategoryTranslationKey(cat.name, i18n.language)}
                         </SelectItem>
                       ))}
                     </SelectContent>
