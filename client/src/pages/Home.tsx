@@ -6,10 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Loader2, ShoppingBag, Plus } from "lucide-react";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 
 
 export default function Home() {
   const { user, isAuthenticated } = useAuth();
+  const { t } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState<number | undefined>();
 
   // Fetch categories
@@ -44,10 +46,10 @@ export default function Home() {
             </h1>
           </div>
           <p className="text-lg md:text-xl text-muted-foreground mb-2 max-w-2xl mx-auto">
-            探索精選二手商品，發現生活中的隱藏寶藏。每件商品都有故事，每次交易都是新的開始。
+            {t("home.tagline")}
           </p>
           <p className="text-sm md:text-base text-muted-foreground mb-8 max-w-2xl mx-auto italic">
-            Explore curated second-hand treasures. Unique stories, fresh starts.
+            {t("home.taglineEn")}
           </p>
 
           <div className="flex gap-4 justify-center">
@@ -55,7 +57,7 @@ export default function Home() {
               <Link href="/products/create">
                 <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
                   <Plus className="w-5 h-5 mr-2" />
-                  上架商品
+                  {t("home.uploadProduct")}
                 </Button>
               </Link>
             ) : (
@@ -64,12 +66,12 @@ export default function Home() {
                 className="bg-accent hover:bg-accent/90 text-accent-foreground"
                 onClick={() => (window.location.href = getLoginUrl())}
               >
-                登入開始銷售
+                {t("home.loginToSell")}
               </Button>
             )}
             <Link href="/products">
               <Button size="lg" variant="outline">
-                瀏覽所有商品
+                {t("home.browseAll")}
               </Button>
             </Link>
           </div>

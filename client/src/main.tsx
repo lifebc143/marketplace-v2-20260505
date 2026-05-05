@@ -7,6 +7,8 @@ import superjson from "superjson";
 import App from "./App";
 import { getLoginUrl } from "./const";
 import "./index.css";
+import './lib/i18n';
+import { LanguageProvider } from "./contexts/LanguageContext";
 
 const queryClient = new QueryClient();
 
@@ -52,10 +54,18 @@ const trpcClient = trpc.createClient({
   ],
 });
 
+// 初始化 i18n 的語言
+const savedLanguage = localStorage.getItem('language') || 'zh';
+if (window.i18next) {
+  window.i18next.changeLanguage(savedLanguage);
+}
+
 createRoot(document.getElementById("root")!).render(
   <trpc.Provider client={trpcClient} queryClient={queryClient}>
     <QueryClientProvider client={queryClient}>
-      <App />
+      <LanguageProvider>
+        <App />
+      </LanguageProvider>
     </QueryClientProvider>
   </trpc.Provider>
 );

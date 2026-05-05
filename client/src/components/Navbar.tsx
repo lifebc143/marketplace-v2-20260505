@@ -2,22 +2,32 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "wouter";
-import { ShoppingBag, LogOut, Menu, X } from "lucide-react";
+import { ShoppingBag, LogOut, Menu, X, Globe } from "lucide-react";
 import { useState } from "react";
 import NotificationBell from "./NotificationBell";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
+import { useLanguage } from "@/contexts/LanguageContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function Navbar() {
   const { user, isAuthenticated } = useAuth();
   const [, navigate] = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const logoutMutation = trpc.auth.logout.useMutation();
+  const { t } = useTranslation();
+  const { language, setLanguage } = useLanguage();
 
   const handleLogout = async () => {
     try {
       await logoutMutation.mutateAsync();
-      toast.success("已登出");
+      toast.success(t("common.success"));
       navigate("/");
     } catch (error) {
       toast.error("登出失敗");
@@ -36,18 +46,18 @@ export default function Navbar() {
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-6">
           <Link href="/products" className="text-sm hover:text-accent transition">
-            商品
+            {t("nav.products")}
           </Link>
           {isAuthenticated && (
             <>
               <Link href="/my-products" className="text-sm hover:text-accent transition">
-                我的商品
+                {t("nav.myProducts")}
               </Link>
               <Link href="/orders" className="text-sm hover:text-accent transition">
-                訂單
+                {t("nav.orders")}
               </Link>
               <Link href="/messages" className="text-sm hover:text-accent transition">
-                訊息
+                {t("nav.messages")}
               </Link>
             </>
           )}
@@ -55,6 +65,30 @@ export default function Navbar() {
 
         {/* Right Section */}
         <div className="flex items-center gap-4">
+          {/* Language Switcher */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="gap-2">
+                <Globe className="w-4 h-4" />
+                <span className="hidden sm:inline">{language.toUpperCase()}</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={() => setLanguage("zh")}
+                className={language === "zh" ? "bg-accent" : ""}
+              >
+                中文 (Chinese)
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setLanguage("en")}
+                className={language === "en" ? "bg-accent" : ""}
+              >
+                English
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           {isAuthenticated ? (
             <>
               {/* Notification Bell */}
@@ -65,7 +99,7 @@ export default function Navbar() {
                 <span className="text-sm text-muted-foreground">{user?.name}</span>
                 <Link href="/profile">
                   <Button variant="outline" size="sm">
-                    個人資料
+                    {t("nav.profile")}
                   </Button>
                 </Link>
                 <Button
@@ -74,7 +108,7 @@ export default function Navbar() {
                   onClick={handleLogout}
                 >
                   <LogOut className="w-4 h-4 mr-2" />
-                  登出
+                  {t("nav.logout")}
                 </Button>
               </div>
 
@@ -95,7 +129,7 @@ export default function Navbar() {
               onClick={() => (window.location.href = getLoginUrl())}
               className="bg-accent hover:bg-accent/90"
             >
-              登錄
+              {t("nav.login")}
             </Button>
           )}
         </div>
@@ -106,27 +140,27 @@ export default function Navbar() {
         <div className="md:hidden border-t p-4 space-y-2">
           <Link href="/products">
             <Button variant="ghost" className="w-full justify-start">
-              商品
+              {t("nav.products")}
             </Button>
           </Link>
           <Link href="/my-products">
             <Button variant="ghost" className="w-full justify-start">
-              我的商品
+              {t("nav.myProducts")}
             </Button>
           </Link>
           <Link href="/orders">
             <Button variant="ghost" className="w-full justify-start">
-              訂單
+              {t("nav.orders")}
             </Button>
           </Link>
           <Link href="/messages">
             <Button variant="ghost" className="w-full justify-start">
-              訊息
+              {t("nav.messages")}
             </Button>
           </Link>
           <Link href="/profile">
             <Button variant="ghost" className="w-full justify-start">
-              個人資料
+              {t("nav.profile")}
             </Button>
           </Link>
           <Button
@@ -135,7 +169,7 @@ export default function Navbar() {
             onClick={handleLogout}
           >
             <LogOut className="w-4 h-4 mr-2" />
-            登出
+            {t("nav.logout")}
           </Button>
         </div>
       )}
