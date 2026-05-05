@@ -52,6 +52,7 @@
   "orders": {
     "title": "My Orders",
     "noOrders": "You haven't placed any orders yet",
+    "loginRequired": "Please login to view your orders",
     "orderNumber": "Order Number",
     "date": "Date",
     "status": "Status",
@@ -62,7 +63,9 @@
     "pending": "Pending",
     "shipped": "Shipped",
     "delivered": "Delivered",
-    "cancelled": "Cancelled"
+    "cancelled": "Cancelled",
+    "contactSuccess": "Contact information sent to seller",
+    "contactError": "Failed to contact seller, please try again"
   },
   "checkout": {
     "title": "Checkout",

@@ -52,6 +52,7 @@
   "orders": {
     "title": "我的訂單",
     "noOrders": "您還沒有任何訂單",
+    "loginRequired": "請先登錄以查看訂單",
     "orderNumber": "訂單編號",
     "date": "日期",
     "status": "狀態",
@@ -62,7 +63,9 @@
     "pending": "待發貨",
     "shipped": "已發貨",
     "delivered": "已送達",
-    "cancelled": "已取消"
+    "cancelled": "已取消",
+    "contactSuccess": "已向賣家發送你的聯絡信息",
+    "contactError": "聯絡賣家失敗，請重試"
   },
   "checkout": {
     "title": "結帳",

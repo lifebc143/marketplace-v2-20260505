@@ -6,10 +6,12 @@ import { Card } from "@/components/ui/card";
 import { Loader2, ArrowLeft, Package, Clock, CheckCircle, XCircle } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 export default function Orders() {
   const [, navigate] = useLocation();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
 
   // 獲取用戶的訂單列表
@@ -35,10 +37,10 @@ export default function Orders() {
 
     try {
       await contactSellerMutation.mutateAsync({ orderId: selectedOrderId });
-      toast.success("已向賣家發送你的聯絡信息");
+      toast.success(t("orders.contactSuccess"));
     } catch (error: any) {
       console.error("Failed to contact seller:", error);
-      const errorMessage = error?.data?.message || error?.message || "聯絡賣家失敗，請重試";
+      const errorMessage = error?.data?.message || error?.message || t("orders.contactError");
       toast.error(errorMessage);
     }
   };
