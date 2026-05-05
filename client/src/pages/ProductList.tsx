@@ -12,9 +12,11 @@ import {
 } from "@/components/ui/select";
 import { Loader2, ShoppingBag, Search, ArrowLeft } from "lucide-react";
 import { Link, useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 
 export default function ProductList() {
   const [, setLocation] = useLocation();
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [offset, setOffset] = useState(0);
@@ -49,12 +51,12 @@ export default function ProductList() {
               className="gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
-              返回首頁
+              {t("common.back")}
             </Button>
           </div>
-          <h1 className="text-4xl font-bold mb-2">商品列表</h1>
+          <h1 className="text-4xl font-bold mb-2">{t("products.title")}</h1>
           <p className="text-muted-foreground">
-            搜尋和篩選您感興趣的二手商品
+            {t("products.search")}
           </p>
         </div>
       </div>
@@ -64,13 +66,13 @@ export default function ProductList() {
           {/* Sidebar - Filters */}
           <div className="lg:col-span-1">
             <Card className="p-6 sticky top-24">
-              <h2 className="font-bold text-lg mb-6">篩選</h2>
+              <h2 className="font-bold text-lg mb-6">{t("products.category")}</h2>
 
               {/* Search */}
               <form onSubmit={handleSearch} className="mb-6">
                 <div className="relative">
                   <Input
-                    placeholder="搜尋商品..."
+                    placeholder={t("products.search")}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-10"
@@ -83,14 +85,14 @@ export default function ProductList() {
               {categories && categories.length > 0 && (
                 <div>
                   <label className="text-sm font-medium mb-2 block">
-                    分類
+                    {t("products.category")}
                   </label>
                   <Select value={selectedCategory || "all"} onValueChange={(val) => setSelectedCategory(val === "all" ? "" : val)}>
                     <SelectTrigger>
-                      <SelectValue placeholder="選擇分類" />
+                      <SelectValue placeholder={t("products.category")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">全部分類</SelectItem>
+                      <SelectItem value="all">{t("products.category")}</SelectItem>
                       {categories.map((category) => (
                         <SelectItem key={category.id} value={category.id.toString()}>
                           {category.name}
