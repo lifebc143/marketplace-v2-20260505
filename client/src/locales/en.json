@@ -172,5 +172,13 @@
     "previous": "Previous",
     "language": "Language",
     "view": "View"
+  },
+  "messagesPage": {
+    "title": "Messages",
+    "loginRequired": "Please log in to view your messages",
+    "backToHome": "Back to Home",
+    "selectConversation": "Select a conversation to start chatting",
+    "creatingConversation": "Creating conversation...",
+    "failedToCreate": "Failed to create conversation, please try again"
   }
 }

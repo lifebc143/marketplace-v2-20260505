@@ -96,7 +96,7 @@ export default function ProductList() {
                       <SelectItem value="all">{t("products.category")}</SelectItem>
                       {categories.map((category) => (
                         <SelectItem key={category.id} value={category.id.toString()}>
-                          {getCategoryTranslationKey(category.name, i18n.language)}
+                          {t(getCategoryTranslationKey(category.name, i18n.language))}
                         </SelectItem>
                       ))}
                     </SelectContent>

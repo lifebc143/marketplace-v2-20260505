@@ -172,5 +172,13 @@
     "previous": "上一步",
     "language": "語言",
     "view": "查看"
+  },
+  "messagesPage": {
+    "title": "訊息",
+    "loginRequired": "請先登錄以查看訊息",
+    "backToHome": "返回首頁",
+    "selectConversation": "選擇一個對話開始聊天",
+    "creatingConversation": "正在建立對話...",
+    "failedToCreate": "無法建立對話，請重試"
   }
 }

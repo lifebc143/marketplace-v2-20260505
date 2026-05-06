@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Loader2 } from "lucide-react";
@@ -12,6 +13,7 @@ import { toast } from "sonner";
 export default function Messages() {
   const [, navigate] = useLocation();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [selectedConversationId, setSelectedConversationId] = useState<number | null>(null);
   const [isCreatingConversation, setIsCreatingConversation] = useState(false);
   
@@ -37,7 +39,7 @@ export default function Messages() {
         })
         .catch((error) => {
           console.error("Failed to create conversation:", error);
-          toast.error("無法建立對話，請重試");
+          toast.error(t("messagesPage.failedToCreate"));
         })
         .finally(() => {
           setIsCreatingConversation(false);
@@ -49,8 +51,8 @@ export default function Messages() {
     return (
       <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
         <div className="text-center">
-          <p className="text-lg text-muted-foreground mb-4">請先登錄以查看訊息</p>
-          <Button onClick={() => navigate("/")}>返回首頁</Button>
+          <p className="text-lg text-muted-foreground mb-4">{t("messagesPage.loginRequired")}</p>
+          <Button onClick={() => navigate("/")}>{t("messagesPage.backToHome")}</Button>
         </div>
       </div>
     );
@@ -66,33 +68,31 @@ export default function Messages() {
           className="mb-6"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          返回首頁
+          {t("messagesPage.backToHome")}
         </Button>
-
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* 對話列表 */}
           <div className="md:col-span-1">
-            <h2 className="text-2xl font-bold mb-4">訊息</h2>
+            <h2 className="text-2xl font-bold mb-4">{t("messagesPage.title")}</h2>
             <ConversationsList
               onSelectConversation={setSelectedConversationId}
               selectedConversationId={selectedConversationId || undefined}
             />
           </div>
-
           {/* 聊天框 */}
           <div className="md:col-span-2">
             {isCreatingConversation ? (
               <Card className="p-8 text-center text-muted-foreground h-96 flex items-center justify-center">
                 <div>
                   <Loader2 className="w-8 h-8 animate-spin text-accent mx-auto mb-4" />
-                  <p>正在建立對話...</p>
+                  <p>{t("messagesPage.creatingConversation")}</p>
                 </div>
               </Card>
             ) : selectedConversationId ? (
               <ChatBox conversationId={selectedConversationId} />
             ) : (
               <Card className="p-8 text-center text-muted-foreground h-96 flex items-center justify-center">
-                <p>選擇一個對話開始聊天</p>
+                <p>{t("messagesPage.selectConversation")}</p>
               </Card>
             )}
           </div>
