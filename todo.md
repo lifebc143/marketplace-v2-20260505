@@ -315,3 +315,8 @@
 - [x] 驗證分類英文切換效果（需截圖或測試）
 - [x] 為 CreateProduct 和 EditProduct 頁面添加英文翻譯支持
 - [x] 編寫分類翻譯的單元測試
+
+## 待修複的首頁英文翻譯問題
+
+- [x] 移除首頁英文副標題 (Explore curated second-hand treasures...)
+- [x] 修正分類在英文版時仍顯示中文的問題

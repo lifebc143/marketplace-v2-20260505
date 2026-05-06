@@ -46,11 +46,8 @@ export default function Home() {
               Marketplace
             </h1>
           </div>
-          <p className="text-lg md:text-xl text-muted-foreground mb-2 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
             {t("home.tagline")}
-          </p>
-          <p className="text-sm md:text-base text-muted-foreground mb-8 max-w-2xl mx-auto italic">
-            {t("home.taglineEn")}
           </p>
 
           <div className="flex gap-4 justify-center">
