@@ -69,7 +69,10 @@ describe("Orders Router", () => {
           productId: 456,
           status: "pending",
           totalPrice: 10000,
-          shippingAddress: expect.stringContaining("John Doe"),
+          recipientName: "John Doe",
+          recipientPhone: "123-456-7890",
+          recipientAddress: "123 Main St, City, Country",
+          notes: "Please deliver after 3pm",
         })
       );
 
