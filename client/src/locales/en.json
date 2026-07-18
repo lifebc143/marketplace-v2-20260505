@@ -42,6 +42,8 @@
       "machinery": "Machinery",
       "sports": "Sports",
       "furniture": "Furniture",
+      "toys": "Toys",
+      "animeFigures": "Anime Figures",
       "houseRental": "Free Items",
       "other": "Other"
     }

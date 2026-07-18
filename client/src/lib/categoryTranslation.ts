@@ -36,6 +36,22 @@ export const categoryDisplayNameMapZh: Record<string, string> = {
   "飾品": "飾品",
   "Accessories": "飾品",
   
+  // Toys
+  "玩具": "玩具",
+  "Toys": "玩具",
+  
+  // Anime Figures
+  "動漫公仔": "動漫公仔",
+  "Anime Figures": "動漫公仔",
+  
+  // Machinery
+  "機械": "機械",
+  "Machinery": "機械",
+  
+  // Furniture
+  "家具": "家具",
+  "Furniture": "家具",
+  
   // House Rental
   "房屋租賃": "房屋租賃",
   "House Rental": "房屋租賃",
@@ -84,6 +100,22 @@ export const categoryDisplayNameMapEn: Record<string, string> = {
   // Accessories
   "飾品": "Accessories",
   "Accessories": "Accessories",
+  
+  // Toys
+  "玩具": "Toys",
+  "Toys": "Toys",
+  
+  // Anime Figures
+  "動漫公仔": "Anime Figures",
+  "Anime Figures": "Anime Figures",
+  
+  // Machinery
+  "機械": "Machinery",
+  "Machinery": "Machinery",
+  
+  // Furniture
+  "家具": "Furniture",
+  "Furniture": "Furniture",
   
   // House Rental
   "房屋租賃": "House Rental",
