@@ -77,7 +77,10 @@ export default function AdminBanners() {
         // Convert file to base64
         const buffer = await imageFile.arrayBuffer();
         const uint8Array = new Uint8Array(buffer);
-        const binaryString = String.fromCharCode.apply(null, Array.from(uint8Array));
+        let binaryString = '';
+        for (let i = 0; i < uint8Array.length; i++) {
+          binaryString += String.fromCharCode(uint8Array[i]);
+        }
         const base64Data = btoa(binaryString);
         
         // Upload via tRPC
