@@ -115,7 +115,7 @@ export default function Footer() {
 
         {/* Bottom */}
         <div className="border-t border-border pt-8 text-center text-sm text-muted-foreground">
-          <p>&copy; 2026 Marketplace. {t("footer.allRightsReserved")}</p>
+          <p>&copy; 2026 AmmoliteLife 斑彩人生 {t("footer.allRightsReserved")}</p>
         </div>
       </div>
     </footer>
