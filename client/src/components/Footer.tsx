@@ -43,9 +43,9 @@ export default function Footer() {
             <h3 className="font-bold text-lg mb-4">{t("footer.support")}</h3>
             <ul className="space-y-2">
               <li>
-                <a href="mailto:support@marketplace.com" className="text-sm text-muted-foreground hover:text-foreground transition">
-                  {t("footer.contactUs")}
-                </a>
+              <a href="mailto:lifeabcaglary@gmail.com" className="text-sm text-muted-foreground hover:text-foreground transition">
+                {t("footer.contactUs")}
+              </a>
               </li>
               <li>
                 <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition">

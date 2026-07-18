@@ -331,3 +331,9 @@
 - [x] 添加 Footer 翻譯鍵到中英文翻譯文件
 - [x] 在 App.tsx 中添加 Footer 組件
 - [x] Footer 中添加 Terms 頁面連結
+
+## 已完成的功能 - 聯絡郵箱更新
+
+- [x] 更新 Footer 組件中的聯絡郵箱為 lifeabcaglary@gmail.com
+- [x] 驗證郵箱在中英文版本都正確顯示
+- [x] 所有 51 個單元測試通過
