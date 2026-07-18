@@ -344,3 +344,12 @@
 - [x] 配置 Instagram 連結指向 https://www.instagram.com/ammolitelife/
 - [x] 設置連結在新分頁開啟 (target="_blank")
 - [x] 所有 51 個單元測試通過
+
+## 已完成的功能 - 擴展社群連結
+
+- [x] 在 Footer「追蹤我們」部分添加 Threads 圖標
+- [x] 配置 Threads 連結指向 https://www.threads.com/ammolitelife
+- [x] 在 Footer「追蹤我們」部分添加 YouTube 圖標
+- [x] 配置 YouTube 連結指向 https://www.youtube.com/lifebc
+- [x] 所有社群連結設置在新分頁開啟 (target="_blank")
+- [x] 所有 51 個單元測試通過
