@@ -52,6 +52,8 @@ export default function AdminNativeAds() {
     },
   });
 
+  const uploadMutation = trpc.upload.image.useMutation();
+
   const resetForm = () => {
     setFormData({
       title: '',
@@ -94,7 +96,6 @@ export default function AdminNativeAds() {
         const base64Data = btoa(binaryString);
         
         // Upload via tRPC
-        const uploadMutation = trpc.upload.image.useMutation();
         const uploadResult = await new Promise((resolve, reject) => {
           uploadMutation.mutate(
             {

@@ -49,6 +49,8 @@ export default function AdminBanners() {
     },
   });
 
+  const uploadMutation = trpc.upload.image.useMutation();
+
   const resetForm = () => {
     setFormData({ title: '', externalLink: '', position: 0 });
     setImageFile(null);
@@ -84,7 +86,6 @@ export default function AdminBanners() {
         const base64Data = btoa(binaryString);
         
         // Upload via tRPC
-        const uploadMutation = trpc.upload.image.useMutation();
         const uploadResult = await new Promise((resolve, reject) => {
           uploadMutation.mutate(
             {
