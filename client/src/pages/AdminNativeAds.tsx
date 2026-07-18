@@ -94,10 +94,19 @@ export default function AdminNativeAds() {
         const base64Data = btoa(binaryString);
         
         // Upload via tRPC
-        const uploadResult = await trpc.upload.image.mutate({
-          fileName: imageFile.name,
-          fileData: base64Data,
-          type: 'native-ad',
+        const uploadMutation = trpc.upload.image.useMutation();
+        const uploadResult = await new Promise((resolve, reject) => {
+          uploadMutation.mutate(
+            {
+              fileName: imageFile.name,
+              fileData: base64Data,
+              type: 'native-ad',
+            },
+            {
+              onSuccess: (data) => resolve(data),
+              onError: (error) => reject(error),
+            }
+          );
         });
         
         imageUrl = uploadResult.url;
