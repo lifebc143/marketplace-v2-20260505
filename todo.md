@@ -370,28 +370,28 @@
 
 ### 第一階段：數據庫設計與後端 API
 
-- [ ] 設計 banners 表（id, title, imageUrl, externalLink, position, isActive, createdAt, updatedAt）
-- [ ] 設計 native_ads 表（id, title, imageUrl, price, discount, externalLink, position, isActive, createdAt, updatedAt）
-- [ ] 設計 ad_statistics 表（id, bannerId/adId, type, impressions, clicks, createdAt）
-- [ ] 建立 Banner 相關 API（create, update, delete, list, getById）
-- [ ] 建立 Native Ad 相關 API（create, update, delete, list, getById）
-- [ ] 建立統計追蹤 API（recordImpression, recordClick, getStats）
+- [x] 設計 banners 表（id, title, imageUrl, externalLink, position, isActive, createdAt, updatedAt）
+- [x] 設計 native_ads 表（id, title, imageUrl, price, discount, externalLink, position, isActive, createdAt, updatedAt）
+- [x] 設計 ad_statistics 表（id, bannerId/adId, type, impressions, clicks, createdAt）
+- [x] 建立 Banner 相關 API（create, update, delete, list, getById）
+- [x] 建立 Native Ad 相關 API（create, update, delete, list, getById）
+- [x] 建立統計追蹤 API（recordImpression, recordClick, getStats）
 
 ### 第二階段：首頁 Banner 輪播前端
 
-- [ ] 創建 HomeBannerCarousel 組件
-- [ ] 實現自動播放（5秒間隔）
-- [ ] 實現左右手動切換功能
-- [ ] 配置響應式設計（RWD）
-- [ ] 集成點擊追蹤
-- [ ] 集成展示追蹤
+- [x] 創建 HomeBannerCarousel 組件
+- [x] 實現自動播放（5秒間隔）
+- [x] 實現左右手動切換功能
+- [x] 配置響應式設計（RWD）
+- [x] 集成點擊追蹤
+- [x] 集成展示追蹤
 
 ### 第三階段：商品列表原生廣告前端
 
-- [ ] 修改商品列表組件支援廣告插入
-- [ ] 實現每 6 個商品後插入 1 個廣告的邏輯
-- [ ] 創建原生廣告卡片組件（與商品卡片保持一致）
-- [ ] 添加「全新品」或「贊助」標籤
+- [x] 修改商品列表組件支援廣告插入
+- [x] 實現每 6 個商品後插入 1 個廣告的邏輯
+- [x] 創建原生廣告卡片組件（與商品卡片保持一致）
+- [x] 添加「全新品」或「贊助」標籤
 - [ ] 集成點擊追蹤
 - [ ] 集成展示追蹤
 

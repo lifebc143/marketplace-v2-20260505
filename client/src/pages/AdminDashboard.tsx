@@ -4,7 +4,7 @@ import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Loader2, Users, ShoppingBag, AlertCircle, ArrowLeft, Tag, TrendingUp, Clock } from "lucide-react";
+import { Loader2, Users, ShoppingBag, AlertCircle, ArrowLeft, Tag, TrendingUp, Clock, BarChart3, Megaphone } from "lucide-react";
 import { Link } from "wouter";
 
 export default function AdminDashboard() {
@@ -269,6 +269,24 @@ export default function AdminDashboard() {
                   <Button variant="outline" className="w-full">
                     <Tag className="w-4 h-4 mr-2" />
                     分類管理
+                  </Button>
+                </Link>
+                <Link href="/admin/banners">
+                  <Button variant="outline" className="w-full">
+                    <Megaphone className="w-4 h-4 mr-2" />
+                    Banner 管理
+                  </Button>
+                </Link>
+                <Link href="/admin/native-ads">
+                  <Button variant="outline" className="w-full">
+                    <Megaphone className="w-4 h-4 mr-2" />
+                    廣告管理
+                  </Button>
+                </Link>
+                <Link href="/admin/ad-analytics">
+                  <Button variant="outline" className="w-full">
+                    <BarChart3 className="w-4 h-4 mr-2" />
+                    廣告統計
                   </Button>
                 </Link>
               </div>

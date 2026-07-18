@@ -14,6 +14,8 @@ import { Loader2, ShoppingBag, Search, ArrowLeft } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { getCategoryTranslationKey } from "@/lib/categoryTranslation";
+import { NativeAdCard } from "@/components/NativeAdCard";
+import type { NativeAd } from "@/types/advertising";
 
 export default function ProductList() {
   const [, setLocation] = useLocation();
@@ -33,6 +35,28 @@ export default function ProductList() {
     limit,
     offset,
   });
+
+  // Fetch native ads
+  const { data: nativeAds = [] } = trpc.advertising.nativeAds.getAll.useQuery();
+
+  // Helper function to insert ads every 6 products
+  const productsWithAds = (() => {
+    if (!products || nativeAds.length === 0) return products;
+
+    const result: any[] = [];
+    let adIndex = 0;
+
+    products.forEach((product: any, index: number) => {
+      result.push(product);
+      // Insert ad after every 6 products
+      if ((index + 1) % 6 === 0 && adIndex < nativeAds.length) {
+        result.push({ _isAd: true, ad: nativeAds[adIndex % nativeAds.length] });
+        adIndex++;
+      }
+    });
+
+    return result;
+  })();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -136,7 +160,16 @@ export default function ProductList() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
-                  {products.map((product) => {
+                  {productsWithAds?.map((item: any, index: number) => {
+                    // Check if this is an ad
+                    if ('_isAd' in item && item._isAd) {
+                      return (
+                        <NativeAdCard key={`ad-${index}`} ad={item.ad} />
+                      );
+                    }
+
+                    // Otherwise render product
+                    const product = item;
                     const firstImage = product.images && product.images.length > 0 ? product.images[0] : null;
                     return (
                       <Link key={product.id} href={`/products/${product.id}`}>

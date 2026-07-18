@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
+import type { Banner } from '@/types/advertising';
 
 export function HomeBannerCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -8,6 +9,10 @@ export function HomeBannerCarousel() {
 
   // Fetch banners
   const { data: banners = [] } = trpc.advertising.banners.getAll.useQuery();
+
+  // Setup mutations for tracking
+  const recordImpressionMutation = trpc.advertising.analytics.recordBannerImpression.useMutation();
+  const recordClickMutation = trpc.advertising.analytics.recordBannerClick.useMutation();
 
   // Auto-play effect
   useEffect(() => {
@@ -23,11 +28,7 @@ export function HomeBannerCarousel() {
   // Record impression when banner changes
   useEffect(() => {
     if (banners.length > 0 && banners[currentIndex]) {
-      // Record impression
-      trpc.advertising.analytics.recordBannerImpression.mutate(
-        { bannerId: banners[currentIndex].id },
-        { onError: () => {} } // Silently fail
-      );
+      recordImpressionMutation.mutate({ bannerId: banners[currentIndex].id });
     }
   }, [currentIndex, banners]);
 
@@ -45,91 +46,72 @@ export function HomeBannerCarousel() {
     setCurrentIndex((prev) => (prev + 1) % banners.length);
   };
 
-  const handleBannerClick = (banner: typeof banners[0]) => {
+  const handleBannerClick = (banner: Banner) => {
     // Record click
-    trpc.advertising.analytics.recordBannerClick.mutate(
-      { bannerId: banner.id },
-      { onError: () => {} } // Silently fail
-    );
-
+    recordClickMutation.mutate({ bannerId: banner.id });
     // Open external link
     window.open(banner.externalLink, '_blank');
   };
 
-  const handleDotClick = (index: number) => {
-    setAutoPlayEnabled(false);
-    setCurrentIndex(index);
-  };
-
-  // Re-enable auto-play after 10 seconds of inactivity
-  useEffect(() => {
-    if (!autoPlayEnabled && banners.length > 0) {
-      const timer = setTimeout(() => {
-        setAutoPlayEnabled(true);
-      }, 10000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [autoPlayEnabled, banners.length]);
-
   const currentBanner = banners[currentIndex];
 
   return (
-    <div className="relative w-full bg-background rounded-lg overflow-hidden shadow-lg">
+    <div className="relative w-full bg-gradient-to-r from-primary/5 to-accent/5 rounded-lg overflow-hidden">
       {/* Banner Container */}
-      <div className="relative w-full aspect-[3/1] bg-muted">
-        {/* Current Banner Image */}
+      <div className="relative w-full aspect-[3/1] overflow-hidden">
+        {/* Banner Image */}
         <img
           src={currentBanner.imageUrl}
           alt={currentBanner.title}
-          className="w-full h-full object-cover cursor-pointer transition-opacity hover:opacity-90"
+          className="w-full h-full object-contain"
           onClick={() => handleBannerClick(currentBanner)}
+          style={{ cursor: 'pointer' }}
         />
 
-        {/* Navigation Arrows */}
-        {banners.length > 1 && (
-          <>
-            <button
-              onClick={handlePrev}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
-              aria-label="Previous banner"
-            >
-              <ChevronLeft size={24} />
-            </button>
+        {/* Left Arrow */}
+        <button
+          onClick={handlePrev}
+          className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-colors"
+          aria-label="Previous banner"
+        >
+          <ChevronLeft className="w-6 h-6" />
+        </button>
 
-            <button
-              onClick={handleNext}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
-              aria-label="Next banner"
-            >
-              <ChevronRight size={24} />
-            </button>
-          </>
-        )}
+        {/* Right Arrow */}
+        <button
+          onClick={handleNext}
+          className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-colors"
+          aria-label="Next banner"
+        >
+          <ChevronRight className="w-6 h-6" />
+        </button>
 
-        {/* Title Overlay */}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-          <h3 className="text-white font-semibold text-lg">{currentBanner.title}</h3>
-        </div>
-      </div>
-
-      {/* Dot Navigation */}
-      {banners.length > 1 && (
-        <div className="flex justify-center gap-2 p-4 bg-background">
+        {/* Indicators */}
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10 flex gap-2">
           {banners.map((_, index) => (
             <button
               key={index}
-              onClick={() => handleDotClick(index)}
-              className={`w-2 h-2 rounded-full transition-all ${
+              onClick={() => {
+                setAutoPlayEnabled(false);
+                setCurrentIndex(index);
+              }}
+              className={`h-2 rounded-full transition-all ${
                 index === currentIndex
-                  ? 'bg-primary w-6'
-                  : 'bg-muted-foreground/50 hover:bg-muted-foreground'
+                  ? 'bg-white w-8'
+                  : 'bg-white/50 w-2 hover:bg-white/75'
               }`}
               aria-label={`Go to banner ${index + 1}`}
             />
           ))}
         </div>
-      )}
+      </div>
+
+      {/* Banner Info */}
+      <div className="p-4 text-center">
+        <p className="text-sm text-muted-foreground">
+          {currentIndex + 1} / {banners.length}
+        </p>
+      </div>
     </div>
   );
 }

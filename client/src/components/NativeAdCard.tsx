@@ -7,21 +7,18 @@ interface NativeAdCardProps {
 }
 
 export function NativeAdCard({ ad }: NativeAdCardProps) {
+  // Setup mutations for tracking
+  const recordImpressionMutation = trpc.advertising.analytics.recordNativeAdImpression.useMutation();
+  const recordClickMutation = trpc.advertising.analytics.recordNativeAdClick.useMutation();
+
   // Record impression on mount
   useEffect(() => {
-    trpc.advertising.analytics.recordNativeAdImpression.mutate(
-      { adId: ad.id },
-      { onError: () => {} } // Silently fail
-    );
+    recordImpressionMutation.mutate({ adId: ad.id });
   }, [ad.id]);
 
   const handleClick = () => {
     // Record click
-    trpc.advertising.analytics.recordNativeAdClick.mutate(
-      { adId: ad.id },
-      { onError: () => {} } // Silently fail
-    );
-
+    recordClickMutation.mutate({ adId: ad.id });
     // Open external link
     window.open(ad.externalLink, '_blank');
   };
@@ -69,10 +66,7 @@ export function NativeAdCard({ ad }: NativeAdCardProps) {
           )}
         </div>
 
-        {/* CTA */}
-        <button className="w-full mt-3 bg-primary text-primary-foreground py-2 rounded text-sm font-medium hover:bg-primary/90 transition-colors">
-          查看詳情
-        </button>
+          {/* CTA - 點擊卡片即可開啟連結 */}
       </div>
     </div>
   );

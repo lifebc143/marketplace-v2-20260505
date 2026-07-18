@@ -24,6 +24,9 @@ import Messages from "./pages/Messages";
 import EditProduct from "./pages/EditProduct";
 import { Terms } from "./pages/Terms";
 import Footer from "./components/Footer";
+import AdminBanners from "./pages/AdminBanners";
+import AdminNativeAds from "./pages/AdminNativeAds";
+import AdminAdAnalytics from "./pages/AdminAdAnalytics";
 
 function Router() {
   // Route order matters: specific routes must come before dynamic ones
@@ -52,6 +55,9 @@ function Router() {
       <Route path={"/admin/products"} component={AdminProducts} />
       <Route path={"/admin/all-products"} component={AdminAllProducts} />
       <Route path={"/admin/categories"} component={AdminCategories} />
+      <Route path={"/admin/banners"} component={AdminBanners} />
+      <Route path={"/admin/native-ads"} component={AdminNativeAds} />
+      <Route path={"/admin/ad-analytics"} component={AdminAdAnalytics} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
