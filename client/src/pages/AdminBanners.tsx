@@ -74,11 +74,21 @@ export default function AdminBanners() {
 
       // Upload image if provided
       if (imageFile) {
+        // Convert file to base64
         const buffer = await imageFile.arrayBuffer();
-        // In a real app, you'd call the upload API here
-        // For now, we'll use a placeholder
-        imageUrl = URL.createObjectURL(imageFile);
-        imageKey = `banner-${Date.now()}`;
+        const uint8Array = new Uint8Array(buffer);
+        const binaryString = String.fromCharCode.apply(null, Array.from(uint8Array));
+        const base64Data = btoa(binaryString);
+        
+        // Upload via tRPC
+        const uploadResult = await trpc.upload.image.mutate({
+          fileName: imageFile.name,
+          fileData: base64Data,
+          type: 'banner',
+        });
+        
+        imageUrl = uploadResult.url;
+        imageKey = uploadResult.key;
       }
 
       if (editingId) {
