@@ -180,5 +180,39 @@
     "selectConversation": "選擇一個對話開始聊天",
     "creatingConversation": "正在建立對話...",
     "failedToCreate": "無法建立對話，請重試"
+  },
+  "terms": {
+    "title": "用戶同意條款",
+    "backToHome": "返回",
+    "lastUpdated": "最後更新：2026年5月11日",
+    "section1Title": "1. 服務條款",
+    "section1Content": "本平台（「二手市集」）是一個連接買家和賣家的線上交易平台。使用本平台即表示您同意遵守本條款。",
+    "section2Title": "2. 用戶責任",
+    "section2Content": "您同意：\n• 提供真實、準確的個人資訊\n• 不上傳非法、騷擾或侵犯他人權利的內容\n• 遵守所有適用的法律和法規\n• 對您的帳戶活動負責",
+    "section3Title": "3. 商品發佈",
+    "section3Content": "賣家同意：\n• 只上傳自己拍攝或擁有版權的圖片\n• 準確描述商品狀況和功能\n• 不發佈虛假或誤導性資訊\n• 遵守所有產品安全法規",
+    "section4Title": "4. 交易條款",
+    "section4Content": "• 買家和賣家應通過平台內訊息溝通\n• 建議面交時選擇安全公共場所\n• 建議使用安全的付款方式\n• 一手交錢，一手交貨\n• 拒絕先行匯款或轉帳",
+    "section5Title": "5. 免責聲明",
+    "section5Content": "本平台不對以下情況負責：\n• 買賣雙方之間的交易糾紛\n• 商品品質或真偽問題\n• 個人物品遺失或損壞\n• 詐騙或欺詐行為\n• 用戶之間的爭議",
+    "section6Title": "6. 帳戶終止",
+    "section6Content": "本平台保留以下權利：\n• 終止違反本條款的用戶帳戶\n• 移除違規內容\n• 禁止用戶重新註冊\n• 配合執法機構調查",
+    "section7Title": "7. 修改條款",
+    "section7Content": "本平台可隨時修改本條款。繼續使用本平台即表示您同意修改後的條款。",
+    "contactUs": "如有任何疑問，請聯絡我們的客服團隊。"
+  },
+  "footer": {
+    "about": "關於我們",
+    "aboutDescription": "二手市集是一個連接買家和賣家的線上交易平台，致力於推動循環經濟。",
+    "links": "快速連結",
+    "browseProducts": "瀏覽商品",
+    "terms": "用戶條款",
+    "policy": "隱私政策",
+    "support": "支持",
+    "contactUs": "聯絡我們",
+    "faq": "常見問題",
+    "followUs": "追蹤我們",
+    "socialDescription": "在社群媒體上追蹤我們以獲取最新資訊。",
+    "allRightsReserved": "版權所有。"
   }
 }

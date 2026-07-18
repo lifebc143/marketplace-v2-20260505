@@ -180,5 +180,39 @@
     "selectConversation": "Select a conversation to start chatting",
     "creatingConversation": "Creating conversation...",
     "failedToCreate": "Failed to create conversation, please try again"
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "backToHome": "Back to Home",
+    "lastUpdated": "Last Updated: May 11, 2026",
+    "section1Title": "1. Service Terms",
+    "section1Content": "This platform (\"Second-hand Marketplace\") is an online trading platform connecting buyers and sellers. By using this platform, you agree to comply with these terms.",
+    "section2Title": "2. User Responsibilities",
+    "section2Content": "You agree to:\n• Provide accurate and truthful personal information\n• Not upload illegal, harassing, or infringing content\n• Comply with all applicable laws and regulations\n• Be responsible for your account activities",
+    "section3Title": "3. Product Listing",
+    "section3Content": "Sellers agree to:\n• Only upload photos you have taken or own the copyright to\n• Accurately describe product condition and functionality\n• Not publish false or misleading information\n• Comply with all product safety regulations",
+    "section4Title": "4. Transaction Terms",
+    "section4Content": "• Buyers and sellers should communicate through platform messages\n• Recommend meeting in safe public places for in-person transactions\n• Recommend using secure payment methods\n• Cash on delivery\n• Reject advance transfers or wire transfers",
+    "section5Title": "5. Disclaimer",
+    "section5Content": "The platform is not responsible for:\n• Transaction disputes between buyers and sellers\n• Product quality or authenticity issues\n• Loss or damage of personal items\n• Fraud or deceptive practices\n• Disputes between users",
+    "section6Title": "6. Account Termination",
+    "section6Content": "The platform reserves the right to:\n• Terminate user accounts that violate these terms\n• Remove violating content\n• Prohibit users from re-registering\n• Cooperate with law enforcement investigations",
+    "section7Title": "7. Modification of Terms",
+    "section7Content": "The platform may modify these terms at any time. Continued use of the platform indicates your agreement to the modified terms.",
+    "contactUs": "If you have any questions, please contact our customer service team."
+  },
+  "footer": {
+    "about": "About Us",
+    "aboutDescription": "Second-hand Marketplace is an online trading platform connecting buyers and sellers, committed to promoting a circular economy.",
+    "links": "Quick Links",
+    "browseProducts": "Browse Products",
+    "terms": "Terms of Service",
+    "policy": "Privacy Policy",
+    "support": "Support",
+    "contactUs": "Contact Us",
+    "faq": "FAQ",
+    "followUs": "Follow Us",
+    "socialDescription": "Follow us on social media for the latest updates.",
+    "allRightsReserved": "All rights reserved."
   }
 }

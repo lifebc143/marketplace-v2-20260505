@@ -320,3 +320,14 @@
 
 - [x] 移除首頁英文副標題 (Explore curated second-hand treasures...)
 - [x] 修正分類在英文版時仍顯示中文的問題
+
+
+## 已完成的功能 - 用戶同意條款頁面
+
+- [x] 添加 Terms 頁面翻譯鍵到中英文翻譯文件
+- [x] 創建 Terms 頁面組件
+- [x] 在 App.tsx 中注冊 Terms 路由
+- [x] 創建 Footer 組件
+- [x] 添加 Footer 翻譯鍵到中英文翻譯文件
+- [x] 在 App.tsx 中添加 Footer 組件
+- [x] Footer 中添加 Terms 頁面連結

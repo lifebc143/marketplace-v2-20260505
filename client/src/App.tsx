@@ -22,6 +22,8 @@ import OrderConfirmation from "./pages/OrderConfirmation";
 import Policy from "./pages/Policy";
 import Messages from "./pages/Messages";
 import EditProduct from "./pages/EditProduct";
+import { Terms } from "./pages/Terms";
+import Footer from "./components/Footer";
 
 function Router() {
   // Route order matters: specific routes must come before dynamic ones
@@ -29,7 +31,9 @@ function Router() {
   return (
     <>
       <Navbar />
-      <Switch>
+      <div className="min-h-screen flex flex-col">
+        <div className="flex-1">
+          <Switch>
       <Route path={"/"} component={Home} />
       <Route path={"/products"} component={ProductList} />
       <Route path={"/products/create"} component={CreateProduct} />
@@ -39,6 +43,7 @@ function Router() {
       <Route path={"/orders/:id/confirmation"} component={OrderConfirmation} />
       <Route path={"/messages"} component={Messages} />
       <Route path={"/policy"} component={Policy} />
+      <Route path={"/terms"} component={Terms} />
       <Route path={"/products/:id"} component={ProductDetail} />
       <Route path={"/my-products"} component={MyProducts} />
       <Route path={"/profile"} component={Profile} />
@@ -50,7 +55,10 @@ function Router() {
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
-      </Switch>
+          </Switch>
+        </div>
+        <Footer />
+      </div>
     </>
   );
 }
