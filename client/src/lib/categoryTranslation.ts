@@ -19,6 +19,7 @@ export const categoryToTranslationKeyMap: Record<string, string> = {
   // Clothing
   "服飾": "products.categories.clothing",
   "Clothing": "products.categories.clothing",
+  "男女服飾": "products.categories.clothing",
   
   // Sports
   "運動用品": "products.categories.sports",
@@ -58,8 +59,36 @@ export const categoryToTranslationKeyMap: Record<string, string> = {
   "房屋租賃": "products.categories.houseRental",
   "House Rental": "products.categories.houseRental",
   
-  // Other
-  "其他": "products.categories.other",
+  // Pets
+  "寵物": "products.categories.pets",
+  "Pets": "products.categories.pets",
+  
+  // Office Supplies
+  "辦公用品": "products.categories.officeSupplies",
+  "Office Supplies": "products.categories.officeSupplies",
+  
+  // Perfume
+  "香水": "products.categories.perfume",
+  "Perfume": "products.categories.perfume",
+  
+  // Access Control / Security
+  "門禁設備": "products.categories.securityEquipment",
+  "Security Equipment": "products.categories.securityEquipment",
+  
+  // Classified Ads
+  "分類廣告": "products.categories.classifiedAds",
+  "Classified Ads": "products.categories.classifiedAds",
+  
+  // Jobs
+  "找工作": "products.categories.jobs",
+  "Jobs": "products.categories.jobs",
+  
+  // Dating
+  "相親-男女": "products.categories.dating",
+  "Dating": "products.categories.dating",
+  
+  // Other / Miscellaneous
+  "其他類別": "products.categories.other",
   "Other": "products.categories.other",
 };
 
@@ -94,6 +123,13 @@ export function getCategoryDisplayName(categoryName: string, language: string = 
     "products.categories.toys": "玩具",
     "products.categories.animeFigures": "動漫公仔",
     "products.categories.houseRental": "免費商品",
+    "products.categories.pets": "寵物",
+    "products.categories.officeSupplies": "辦公用品",
+    "products.categories.perfume": "香水",
+    "products.categories.securityEquipment": "門禁設備",
+    "products.categories.classifiedAds": "分類廣告",
+    "products.categories.jobs": "找工作",
+    "products.categories.dating": "相親-男女",
     "products.categories.other": "其他",
   };
   
@@ -108,6 +144,13 @@ export function getCategoryDisplayName(categoryName: string, language: string = 
     "products.categories.toys": "Toys",
     "products.categories.animeFigures": "Anime Figures",
     "products.categories.houseRental": "Free Items",
+    "products.categories.pets": "Pets",
+    "products.categories.officeSupplies": "Office Supplies",
+    "products.categories.perfume": "Perfume",
+    "products.categories.securityEquipment": "Security Equipment",
+    "products.categories.classifiedAds": "Classified Ads",
+    "products.categories.jobs": "Jobs",
+    "products.categories.dating": "Dating",
     "products.categories.other": "Other",
   };
   

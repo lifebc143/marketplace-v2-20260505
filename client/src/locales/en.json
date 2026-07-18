@@ -45,6 +45,13 @@
       "toys": "Toys",
       "animeFigures": "Anime Figures",
       "houseRental": "Free Items",
+      "pets": "Pets",
+      "officeSupplies": "Office Supplies",
+      "perfume": "Perfume",
+      "securityEquipment": "Security Equipment",
+      "classifiedAds": "Classified Ads",
+      "jobs": "Jobs",
+      "dating": "Dating",
       "other": "Other"
     }
   },

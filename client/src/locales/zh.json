@@ -45,6 +45,13 @@
       "toys": "玩具",
       "animeFigures": "動漫公仔",
       "houseRental": "免費商品",
+      "pets": "寵物",
+      "officeSupplies": "辦公用品",
+      "perfume": "香水",
+      "securityEquipment": "門禁設備",
+      "classifiedAds": "分類廣告",
+      "jobs": "找工作",
+      "dating": "相親-男女",
       "other": "其他"
     }
   },
