@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { trpc } from '@/lib/trpc';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, BarChart3, Eye, Click } from 'lucide-react';
+import { Loader2, BarChart3, Eye, MousePointer } from 'lucide-react';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { useLocation } from 'wouter';
 import type { Banner } from '@/types/advertising';
