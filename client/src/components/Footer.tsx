@@ -86,7 +86,7 @@ export default function Footer() {
                 aria-label="Threads"
               >
                 <img
-                  src="/manus-storage/threads_8418f9e3.jpg"
+                  src="/manus-storage/threads_bad8e706.jpg"
                   alt="Threads"
                   className="h-6 w-auto"
                 />
