@@ -82,17 +82,14 @@ export default function Footer() {
                 href="https://www.threads.com/ammolitelife"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground transition"
+                className="hover:opacity-80 transition"
                 aria-label="Threads"
               >
-                <svg
-                  className="w-6 h-6"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path d="M12.001 2.002c5.523 0 10 4.477 10 10s-4.477 10-10 10-10-4.477-10-10 4.477-10 10-10zm0 1.5c-4.694 0-8.5 3.806-8.5 8.5s3.806 8.5 8.5 8.5 8.5-3.806 8.5-8.5-3.806-8.5-8.5-8.5zm0 2c3.59 0 6.5 2.91 6.5 6.5s-2.91 6.5-6.5 6.5-6.5-2.91-6.5-6.5 2.91-6.5 6.5-6.5zm-3 3.5c-.828 0-1.5.672-1.5 1.5s.672 1.5 1.5 1.5 1.5-.672 1.5-1.5-.672-1.5-1.5-1.5zm6 0c-.828 0-1.5.672-1.5 1.5s.672 1.5 1.5 1.5 1.5-.672 1.5-1.5-.672-1.5-1.5-1.5zm-3 4c-1.657 0-3 1.343-3 3v.5c0 .276.224.5.5.5h5c.276 0 .5-.224.5-.5v-.5c0-1.657-1.343-3-3-3z"/>
-                </svg>
+                <img
+                  src="/manus-storage/threads_8418f9e3.jpg"
+                  alt="Threads"
+                  className="h-6 w-auto"
+                />
               </a>
 
               {/* YouTube */}

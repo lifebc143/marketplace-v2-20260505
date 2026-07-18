@@ -353,3 +353,10 @@
 - [x] 配置 YouTube 連結指向 https://www.youtube.com/lifebc
 - [x] 所有社群連結設置在新分頁開啟 (target="_blank")
 - [x] 所有 51 個單元測試通過
+
+## 已完成的功能 - Threads 圖示更新
+
+- [x] 上傳官方 Threads 圖示到 S3 存儲
+- [x] 將 Threads SVG 圖標替換為官方圖示
+- [x] 配置圖示顯示和懸停效果
+- [x] 所有 51 個單元測試通過
