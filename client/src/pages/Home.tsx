@@ -100,7 +100,7 @@ export default function Home() {
                   onClick={() => setSelectedCategory(category.id)}
                   className="whitespace-nowrap"
                 >
-                  {t(getCategoryTranslationKey(category.name, i18n.language))}
+                  {t(getCategoryTranslationKey(category.name))}
                 </Button>
               ))}
             </div>

@@ -284,7 +284,7 @@ export default function EditProduct() {
                     <SelectContent>
                       {categories?.map((cat) => (
                         <SelectItem key={cat.id} value={String(cat.id)}>
-                          {getCategoryTranslationKey(cat.name, i18n.language)}
+                          {t(getCategoryTranslationKey(cat.name))}
                         </SelectItem>
                       ))}
                     </SelectContent>
