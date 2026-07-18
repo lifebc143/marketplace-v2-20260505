@@ -337,3 +337,10 @@
 - [x] 更新 Footer 組件中的聯絡郵箱為 lifeabcaglary@gmail.com
 - [x] 驗證郵箱在中英文版本都正確顯示
 - [x] 所有 51 個單元測試通過
+
+## 已完成的功能 - Instagram 社群連結
+
+- [x] 在 Footer「追蹤我們」部分添加 Instagram 圖標
+- [x] 配置 Instagram 連結指向 https://www.instagram.com/ammolitelife/
+- [x] 設置連結在新分頁開啟 (target="_blank")
+- [x] 所有 51 個單元測試通過
