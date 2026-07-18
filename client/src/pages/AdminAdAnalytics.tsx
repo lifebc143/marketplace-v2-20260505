@@ -92,7 +92,7 @@ export default function AdminAdAnalytics() {
 
                         <div className="bg-accent/10 p-4 rounded-lg">
                           <div className="flex items-center gap-2 mb-2">
-                            <Click className="w-4 h-4 text-accent" />
+                            <MousePointer className="w-4 h-4 text-accent" />
                             <span className="text-sm font-medium">總點擊次數</span>
                           </div>
                           <p className="text-3xl font-bold">
@@ -178,7 +178,7 @@ export default function AdminAdAnalytics() {
 
                         <div className="bg-accent/10 p-4 rounded-lg">
                           <div className="flex items-center gap-2 mb-2">
-                            <Click className="w-4 h-4 text-accent" />
+                            <MousePointer className="w-4 h-4 text-accent" />
                             <span className="text-sm font-medium">總點擊次數</span>
                           </div>
                           <p className="text-3xl font-bold">
