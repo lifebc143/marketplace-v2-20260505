@@ -8,7 +8,7 @@ import { Loader2, ShoppingBag, Plus } from "lucide-react";
 import { Link } from "wouter";
 import { useTranslation } from "react-i18next";
 import { getCategoryTranslationKey } from "@/lib/categoryTranslation";
-
+import { HomeBannerCarousel } from "@/components/HomeBannerCarousel";
 
 export default function Home() {
   const { user, isAuthenticated } = useAuth();
@@ -76,6 +76,11 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Banner Carousel */}
+      <div className="container py-8">
+        <HomeBannerCarousel />
+      </div>
+
       {/* Category Navigation */}
       {categories && categories.length > 0 && (
         <div className="border-b border-border bg-card/50 backdrop-blur sticky top-0 z-40">
@@ -118,20 +123,18 @@ export default function Home() {
                   <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full flex flex-col">
                     {/* Product Image */}
                     <div className="w-full h-48 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center overflow-hidden">
-                      {(product as any).images && (product as any).images.length > 0 ? (
+                      {product.images && product.images.length > 0 && product.images[0].imageUrl ? (
                         <img
-                          src={(product as any).images[0].imageUrl}
+                          src={product.images[0].imageUrl}
                           alt={product.title}
                           className="w-full h-full object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).style.display = "none";
-                          }}
                         />
                       ) : (
                         <ShoppingBag className="w-12 h-12 text-muted-foreground" />
                       )}
                     </div>
 
+                    {/* Product Info */}
                     <div className="p-4 flex-1 flex flex-col">
                       <h3 className="font-bold text-lg mb-2 line-clamp-2 text-foreground">
                         {product.title}
@@ -140,6 +143,7 @@ export default function Home() {
                         {product.description}
                       </p>
 
+                      {/* Price and Condition */}
                       <div className="flex items-center justify-between mt-auto">
                         <span className="text-xl font-bold text-accent">
                           NT${(product.price / 100).toFixed(0)}
@@ -156,27 +160,34 @@ export default function Home() {
           </div>
         ) : (
           <div className="text-center py-20">
-            <ShoppingBag className="w-16 h-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-            <p className="text-lg text-muted-foreground">暫無商品</p>
+            <ShoppingBag className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+            <p className="text-lg text-muted-foreground">{t("products.noProducts")}</p>
           </div>
         )}
       </div>
 
       {/* CTA Section */}
-      <div className="bg-gradient-to-r from-primary to-accent/50 py-16 text-center">
-        <div className="container">
-          <h2 className="text-3xl font-bold mb-4 text-white">{t("home.ctaTitle")}</h2>
-          <p className="text-lg text-white/80 mb-8">
+      <div className="bg-gradient-to-r from-primary/10 to-accent/10 border-t border-border py-16">
+        <div className="container text-center">
+          <h2 className="text-3xl font-bold mb-4">{t("home.ctaTitle")}</h2>
+          <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
             {t("home.ctaDescription")}
           </p>
-          {!isAuthenticated && (
+          {!isAuthenticated ? (
             <Button
               size="lg"
-              className="bg-white text-primary hover:bg-white/90"
+              className="bg-accent hover:bg-accent/90 text-accent-foreground"
               onClick={() => (window.location.href = getLoginUrl())}
             >
               {t("home.register")}
             </Button>
+          ) : (
+            <Link href="/products/create">
+              <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
+                <Plus className="w-5 h-5 mr-2" />
+                {t("home.uploadProduct")}
+              </Button>
+            </Link>
           )}
         </div>
       </div>

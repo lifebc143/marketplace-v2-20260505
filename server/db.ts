@@ -1,6 +1,6 @@
 import { eq, or, and, like, desc, sql, isNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, categories, userProfiles, products, productImages, InsertUserProfile, InsertProduct, InsertProductImage, orders, orderItems, InsertOrder, InsertOrderItem, reviews, InsertReview, Review, conversations, InsertConversation, Conversation, messages, InsertMessage, Message, notifications, InsertNotification, Notification } from "../drizzle/schema";
+import { InsertUser, users, categories, userProfiles, products, productImages, InsertUserProfile, InsertProduct, InsertProductImage, orders, orderItems, InsertOrder, InsertOrderItem, reviews, InsertReview, Review, conversations, InsertConversation, Conversation, messages, InsertMessage, Message, notifications, InsertNotification, Notification, banners, InsertBanner, Banner, nativeAds, InsertNativeAd, NativeAd, adStatistics, InsertAdStatistic, AdStatistic } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -817,4 +817,253 @@ export async function getUnreadMessageCount(userId: number) {
     );
 
   return result[0]?.count || 0;
+}
+
+
+/**
+ * Banner queries
+ */
+export async function getAllBanners() {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db.select().from(banners).where(eq(banners.isActive, 1)).orderBy(banners.position);
+}
+
+export async function getBannerById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(banners).where(eq(banners.id, id)).limit(1);
+  return result[0];
+}
+
+export async function createBanner(data: InsertBanner) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  try {
+    const result = await db.insert(banners).values(data);
+    const insertedId = (result as any)?.insertId || (result as any)?.[0]?.id;
+
+    if (!insertedId) {
+      const inserted = await db.select().from(banners)
+        .orderBy(desc(banners.createdAt))
+        .limit(1);
+
+      if (inserted.length === 0) {
+        throw new Error('Failed to retrieve inserted banner');
+      }
+      return inserted[0];
+    }
+
+    const banner = await db.select().from(banners)
+      .where(eq(banners.id, insertedId))
+      .limit(1);
+
+    if (banner.length === 0) {
+      throw new Error('Failed to retrieve inserted banner');
+    }
+
+    return banner[0];
+  } catch (error) {
+    console.error('[DB] createBanner error:', error);
+    throw error;
+  }
+}
+
+export async function updateBanner(id: number, data: Partial<InsertBanner>) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  await db.update(banners).set(data).where(eq(banners.id, id));
+}
+
+export async function deleteBanner(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  await db.delete(banners).where(eq(banners.id, id));
+}
+
+/**
+ * Native Ads queries
+ */
+export async function getAllNativeAds() {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db.select().from(nativeAds).where(eq(nativeAds.isActive, 1)).orderBy(nativeAds.position);
+}
+
+export async function getNativeAdById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(nativeAds).where(eq(nativeAds.id, id)).limit(1);
+  return result[0];
+}
+
+export async function createNativeAd(data: InsertNativeAd) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  try {
+    const result = await db.insert(nativeAds).values(data);
+    const insertedId = (result as any)?.insertId || (result as any)?.[0]?.id;
+
+    if (!insertedId) {
+      const inserted = await db.select().from(nativeAds)
+        .orderBy(desc(nativeAds.createdAt))
+        .limit(1);
+
+      if (inserted.length === 0) {
+        throw new Error('Failed to retrieve inserted native ad');
+      }
+      return inserted[0];
+    }
+
+    const ad = await db.select().from(nativeAds)
+      .where(eq(nativeAds.id, insertedId))
+      .limit(1);
+
+    if (ad.length === 0) {
+      throw new Error('Failed to retrieve inserted native ad');
+    }
+
+    return ad[0];
+  } catch (error) {
+    console.error('[DB] createNativeAd error:', error);
+    throw error;
+  }
+}
+
+export async function updateNativeAd(id: number, data: Partial<InsertNativeAd>) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  await db.update(nativeAds).set(data).where(eq(nativeAds.id, id));
+}
+
+export async function deleteNativeAd(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  await db.delete(nativeAds).where(eq(nativeAds.id, id));
+}
+
+/**
+ * Ad Statistics queries
+ */
+export async function recordAdImpression(resourceId: number, resourceType: 'banner' | 'native_ad') {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  const today = new Date().toISOString().split('T')[0];
+
+  try {
+    // Check if record exists for today
+    const existing = await db.select().from(adStatistics)
+      .where(
+        and(
+          eq(adStatistics.resourceId, resourceId),
+          eq(adStatistics.resourceType, resourceType),
+          eq(adStatistics.date, today)
+        )
+      )
+      .limit(1);
+
+    if (existing.length > 0) {
+      // Update existing record
+      await db.update(adStatistics)
+        .set({ impressions: sql`impressions + 1` })
+        .where(eq(adStatistics.id, existing[0].id));
+    } else {
+      // Create new record
+      await db.insert(adStatistics).values({
+        resourceId,
+        resourceType,
+        impressions: 1,
+        clicks: 0,
+        date: today,
+      });
+    }
+  } catch (error) {
+    console.error('[DB] recordAdImpression error:', error);
+    // Don't throw - impression tracking is not critical
+  }
+}
+
+export async function recordAdClick(resourceId: number, resourceType: 'banner' | 'native_ad') {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  const today = new Date().toISOString().split('T')[0];
+
+  try {
+    // Check if record exists for today
+    const existing = await db.select().from(adStatistics)
+      .where(
+        and(
+          eq(adStatistics.resourceId, resourceId),
+          eq(adStatistics.resourceType, resourceType),
+          eq(adStatistics.date, today)
+        )
+      )
+      .limit(1);
+
+    if (existing.length > 0) {
+      // Update existing record
+      await db.update(adStatistics)
+        .set({ clicks: sql`clicks + 1` })
+        .where(eq(adStatistics.id, existing[0].id));
+    } else {
+      // Create new record
+      await db.insert(adStatistics).values({
+        resourceId,
+        resourceType,
+        impressions: 0,
+        clicks: 1,
+        date: today,
+      });
+    }
+  } catch (error) {
+    console.error('[DB] recordAdClick error:', error);
+    // Don't throw - click tracking is not critical
+  }
+}
+
+export async function getAdStatistics(resourceId: number, resourceType: 'banner' | 'native_ad') {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db.select().from(adStatistics)
+    .where(
+      and(
+        eq(adStatistics.resourceId, resourceId),
+        eq(adStatistics.resourceType, resourceType)
+      )
+    )
+    .orderBy(desc(adStatistics.date));
+}
+
+export async function getTotalAdStats(resourceId: number, resourceType: 'banner' | 'native_ad') {
+  const db = await getDb();
+  if (!db) return { totalImpressions: 0, totalClicks: 0 };
+
+  const result = await db.select({
+    totalImpressions: sql<number>`SUM(impressions)`,
+    totalClicks: sql<number>`SUM(clicks)`
+  }).from(adStatistics)
+    .where(
+      and(
+        eq(adStatistics.resourceId, resourceId),
+        eq(adStatistics.resourceType, resourceType)
+      )
+    );
+
+  return {
+    totalImpressions: result[0]?.totalImpressions || 0,
+    totalClicks: result[0]?.totalClicks || 0,
+  };
 }

@@ -365,3 +365,75 @@
 
 - [x] 修正首頁「登入開始銷売」為「登入開始銷售」
 - [x] 所有 51 個單元測試通過
+
+## 新增功能 - 首頁 Banner 輪播與原生廣告系統
+
+### 第一階段：數據庫設計與後端 API
+
+- [ ] 設計 banners 表（id, title, imageUrl, externalLink, position, isActive, createdAt, updatedAt）
+- [ ] 設計 native_ads 表（id, title, imageUrl, price, discount, externalLink, position, isActive, createdAt, updatedAt）
+- [ ] 設計 ad_statistics 表（id, bannerId/adId, type, impressions, clicks, createdAt）
+- [ ] 建立 Banner 相關 API（create, update, delete, list, getById）
+- [ ] 建立 Native Ad 相關 API（create, update, delete, list, getById）
+- [ ] 建立統計追蹤 API（recordImpression, recordClick, getStats）
+
+### 第二階段：首頁 Banner 輪播前端
+
+- [ ] 創建 HomeBannerCarousel 組件
+- [ ] 實現自動播放（5秒間隔）
+- [ ] 實現左右手動切換功能
+- [ ] 配置響應式設計（RWD）
+- [ ] 集成點擊追蹤
+- [ ] 集成展示追蹤
+
+### 第三階段：商品列表原生廣告前端
+
+- [ ] 修改商品列表組件支援廣告插入
+- [ ] 實現每 6 個商品後插入 1 個廣告的邏輯
+- [ ] 創建原生廣告卡片組件（與商品卡片保持一致）
+- [ ] 添加「全新品」或「贊助」標籤
+- [ ] 集成點擊追蹤
+- [ ] 集成展示追蹤
+
+### 第四階段：後台管理 - Banner 管理
+
+- [ ] 在 AdminDashboard 添加 Banner 管理頁面
+- [ ] 實現 Banner 列表顯示
+- [ ] 實現新增 Banner 表單
+- [ ] 實現編輯 Banner 表單
+- [ ] 實現刪除 Banner 功能
+- [ ] 實現圖片上傳功能
+- [ ] 實現外部連結配置
+
+### 第五階段：後台管理 - 原生廣告管理
+
+- [ ] 在 AdminDashboard 添加原生廣告管理頁面
+- [ ] 實現廣告列表顯示
+- [ ] 實現新增廣告表單
+- [ ] 實現編輯廣告表單
+- [ ] 實現刪除廣告功能
+- [ ] 實現圖片上傳功能
+- [ ] 實現廠商連結配置
+
+### 第六階段：統計與分析
+
+- [ ] 實現 Banner 點擊統計顯示
+- [ ] 實現 Banner 展示統計顯示
+- [ ] 實現原生廣告點擊統計顯示
+- [ ] 實現原生廣告展示統計顯示
+- [ ] 添加統計圖表（可選）
+- [ ] 實現數據導出功能（可選）
+
+### 第七階段：測試與優化
+
+- [ ] 編寫 Banner 相關單元測試
+- [ ] 編寫原生廣告相關單元測試
+- [ ] 編寫統計追蹤單元測試
+- [ ] 測試響應式設計
+- [ ] 性能優化
+
+### 第八階段：部署與交付
+
+- [ ] 最終檢查與驗收
+- [ ] 建立最終檢查點
+- [ ] 準備部署

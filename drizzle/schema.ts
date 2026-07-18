@@ -166,3 +166,54 @@ export type InsertMessage = typeof messages.$inferInsert;
 export type Message = typeof messages.$inferSelect;
 export type InsertNotification = typeof notifications.$inferInsert;
 export type Notification = typeof notifications.$inferSelect;
+
+// Banner 表 - 首頁輪播廣告
+export const banners = mysqlTable("banners", {
+	id: int().autoincrement().notNull(),
+	title: varchar({ length: 255 }).notNull(),
+	imageUrl: varchar({ length: 500 }).notNull(),
+	imageKey: varchar({ length: 500 }).notNull(),
+	externalLink: varchar({ length: 500 }).notNull(),
+	position: int().default(0).notNull(),
+	isActive: int().default(1).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+});
+
+// Native Ads 表 - 商品列表原生廣告
+export const nativeAds = mysqlTable("nativeAds", {
+	id: int().autoincrement().notNull(),
+	title: varchar({ length: 255 }).notNull(),
+	imageUrl: varchar({ length: 500 }).notNull(),
+	imageKey: varchar({ length: 500 }).notNull(),
+	price: int(),
+	discount: varchar({ length: 100 }),
+	externalLink: varchar({ length: 500 }).notNull(),
+	label: varchar({ length: 50 }).default('贊助').notNull(),
+	position: int().default(0).notNull(),
+	isActive: int().default(1).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+});
+
+// Ad Statistics 表 - 廣告統計
+export const adStatistics = mysqlTable("adStatistics", {
+	id: int().autoincrement().notNull(),
+	resourceId: int().notNull(),
+	resourceType: mysqlEnum(['banner', 'native_ad']).notNull(),
+	impressions: int().default(0).notNull(),
+	clicks: int().default(0).notNull(),
+	date: varchar({ length: 10 }).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("adStatistics_resourceId_type").on(table.resourceId, table.resourceType),
+]);
+
+export type InsertBanner = typeof banners.$inferInsert;
+export type Banner = typeof banners.$inferSelect;
+export type InsertNativeAd = typeof nativeAds.$inferInsert;
+export type NativeAd = typeof nativeAds.$inferSelect;
+export type InsertAdStatistic = typeof adStatistics.$inferInsert;
+export type AdStatistic = typeof adStatistics.$inferSelect;
