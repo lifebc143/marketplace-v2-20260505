@@ -54,8 +54,8 @@ const trpcClient = trpc.createClient({
   ],
 });
 
-// 初始化 i18n 的語言
-const savedLanguage = localStorage.getItem('language') || 'zh';
+// 初始化 i18n 的語言 - 預設為英文
+const savedLanguage = localStorage.getItem('language') || 'en';
 if (window.i18next) {
   window.i18next.changeLanguage(savedLanguage);
 }
