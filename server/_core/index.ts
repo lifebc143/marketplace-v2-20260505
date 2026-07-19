@@ -8,6 +8,7 @@ import { registerStorageProxy } from "./storageProxy";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { initializeBackupCron } from "../backup-cron";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -60,7 +61,20 @@ async function startServer() {
 
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);
+    
+    // 初始化每月備份定時任務
+    try {
+      initializeBackupCron();
+    } catch (error) {
+      console.error('Failed to initialize backup cron:', error);
+    }
   });
 }
+
+// 優雅關閉
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully');
+  process.exit(0);
+});
 
 startServer().catch(console.error);

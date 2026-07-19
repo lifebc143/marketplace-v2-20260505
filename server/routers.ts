@@ -11,6 +11,7 @@ import { messagesRouter } from "./routers/messages";
 import { notificationsRouter } from "./routers/notifications";
 import { advertisingRouter } from "./routers/advertising";
 import { uploadRouter } from "./routers/upload";
+import { backupRouter } from "./routers/backup";
 
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -36,6 +37,7 @@ export const appRouter = router({
   notifications: notificationsRouter,
   advertising: advertisingRouter,
   upload: uploadRouter,
+  backup: backupRouter,
 });
 
 export type AppRouter = typeof appRouter;

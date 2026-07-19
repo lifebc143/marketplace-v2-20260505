@@ -27,6 +27,7 @@ import Footer from "./components/Footer";
 import AdminBanners from "./pages/AdminBanners";
 import AdminNativeAds from "./pages/AdminNativeAds";
 import AdminAdAnalytics from "./pages/AdminAdAnalytics";
+import AdminBackup from "./pages/AdminBackup";
 
 function Router() {
   // Route order matters: specific routes must come before dynamic ones
@@ -58,6 +59,7 @@ function Router() {
       <Route path={"/admin/banners"} component={AdminBanners} />
       <Route path={"/admin/native-ads"} component={AdminNativeAds} />
       <Route path={"/admin/ad-analytics"} component={AdminAdAnalytics} />
+      <Route path={"/admin/backup"} component={AdminBackup} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

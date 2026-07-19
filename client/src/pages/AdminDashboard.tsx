@@ -289,6 +289,12 @@ export default function AdminDashboard() {
                     廣告統計
                   </Button>
                 </Link>
+                <Link href="/admin/backup">
+                  <Button variant="outline" className="w-full">
+                    <Clock className="w-4 h-4 mr-2" />
+                    備份管理
+                  </Button>
+                </Link>
               </div>
             </Card>
           </>
