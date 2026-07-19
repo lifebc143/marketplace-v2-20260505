@@ -36,15 +36,18 @@
     "clearFilters": "清除篩選",
     "categories": {
       "electronics": "電子產品",
-      "clothing": "服飾",
+      "clothing": "男女服飾",
+      "accessories": "飾品",
       "houseRelated": "家居",
-      "automotive": "汽車相關",
+      "automotive": "汽車類",
+      "motorcycles": "機車",
       "machinery": "機械",
       "sports": "運動用品",
       "furniture": "家具",
       "toys": "玩具",
       "animeFigures": "動漫公仔",
-      "houseRental": "免費商品",
+      "freeItems": "免費商品",
+      "houseRental": "房屋租賛",
       "pets": "寵物",
       "officeSupplies": "辦公用品",
       "perfume": "香水",
@@ -52,7 +55,7 @@
       "classifiedAds": "分類廣告",
       "jobs": "找工作",
       "dating": "相親-男女",
-      "other": "其他"
+      "other": "其他類別"
     }
   },
   "productDetail": {

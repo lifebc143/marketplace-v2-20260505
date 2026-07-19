@@ -1,95 +1,64 @@
 /**
  * Category translation mapping utility
  * Maps category names from database to i18n translation keys
+ * Each database category name maps to a unique translation key
  */
 
 // Map of category names (from database) to i18n translation keys
+// IMPORTANT: Each database category should map to exactly ONE translation key to avoid duplicates
 export const categoryToTranslationKeyMap: Record<string, string> = {
   // Electronics
-  "Electronics -電子產品": "products.categories.electronics",
-  "Electronics": "products.categories.electronics",
   "電子產品": "products.categories.electronics",
   
   // House Related
-  "House Related 房屋用品": "products.categories.houseRelated",
-  "House Related": "products.categories.houseRelated",
   "房屋用品": "products.categories.houseRelated",
-  "家居": "products.categories.houseRelated",
   
   // Clothing
-  "服飾": "products.categories.clothing",
-  "Clothing": "products.categories.clothing",
   "男女服飾": "products.categories.clothing",
+  "飾品": "products.categories.accessories",
   
   // Sports
   "運動用品": "products.categories.sports",
-  "Sports": "products.categories.sports",
   
   // Free Items
-  "免費商品": "products.categories.houseRental",
-  "Free Items": "products.categories.houseRental",
+  "免費商品": "products.categories.freeItems",
   
   // Automotive
   "汽車類": "products.categories.automotive",
-  "汽車相關": "products.categories.automotive",
-  "Automotive": "products.categories.automotive",
-  "機車": "products.categories.automotive",
-  
-  // Accessories
-  "飾品": "products.categories.clothing",
-  "Accessories": "products.categories.clothing",
+  "機車": "products.categories.motorcycles",
   
   // Toys
   "玩具": "products.categories.toys",
-  "Toys": "products.categories.toys",
   
   // Anime Figures
   "動漫公仔": "products.categories.animeFigures",
-  "Anime Figures": "products.categories.animeFigures",
-  
-  // Machinery
-  "機械": "products.categories.machinery",
-  "Machinery": "products.categories.machinery",
-  
-  // Furniture
-  "家具": "products.categories.furniture",
-  "Furniture": "products.categories.furniture",
   
   // House Rental
   "房屋租賃": "products.categories.houseRental",
-  "House Rental": "products.categories.houseRental",
   
   // Pets
   "寵物": "products.categories.pets",
-  "Pets": "products.categories.pets",
   
   // Office Supplies
   "辦公用品": "products.categories.officeSupplies",
-  "Office Supplies": "products.categories.officeSupplies",
   
   // Perfume
   "香水": "products.categories.perfume",
-  "Perfume": "products.categories.perfume",
   
-  // Access Control / Security
+  // Security Equipment
   "門禁設備": "products.categories.securityEquipment",
-  "Security Equipment": "products.categories.securityEquipment",
   
   // Classified Ads
   "分類廣告": "products.categories.classifiedAds",
-  "Classified Ads": "products.categories.classifiedAds",
   
   // Jobs
   "找工作": "products.categories.jobs",
-  "Jobs": "products.categories.jobs",
   
   // Dating
   "相親-男女": "products.categories.dating",
-  "Dating": "products.categories.dating",
   
-  // Other / Miscellaneous
+  // Other
   "其他類別": "products.categories.other",
-  "Other": "products.categories.other",
 };
 
 /**
@@ -114,15 +83,18 @@ export function getCategoryDisplayName(categoryName: string, language: string = 
   // Fallback display names
   const displayNamesZh: Record<string, string> = {
     "products.categories.electronics": "電子產品",
-    "products.categories.clothing": "服飾",
-    "products.categories.houseRelated": "家居",
-    "products.categories.automotive": "汽車相關",
+    "products.categories.clothing": "男女服飾",
+    "products.categories.accessories": "飾品",
+    "products.categories.houseRelated": "房屋用品",
+    "products.categories.automotive": "汽車類",
+    "products.categories.motorcycles": "機車",
     "products.categories.machinery": "機械",
     "products.categories.sports": "運動用品",
     "products.categories.furniture": "家具",
     "products.categories.toys": "玩具",
     "products.categories.animeFigures": "動漫公仔",
-    "products.categories.houseRental": "免費商品",
+    "products.categories.freeItems": "免費商品",
+    "products.categories.houseRental": "房屋租賃",
     "products.categories.pets": "寵物",
     "products.categories.officeSupplies": "辦公用品",
     "products.categories.perfume": "香水",
@@ -136,14 +108,17 @@ export function getCategoryDisplayName(categoryName: string, language: string = 
   const displayNamesEn: Record<string, string> = {
     "products.categories.electronics": "Electronics",
     "products.categories.clothing": "Clothing",
+    "products.categories.accessories": "Accessories",
     "products.categories.houseRelated": "House Related",
     "products.categories.automotive": "Automotive",
+    "products.categories.motorcycles": "Motorcycles",
     "products.categories.machinery": "Machinery",
     "products.categories.sports": "Sports",
     "products.categories.furniture": "Furniture",
     "products.categories.toys": "Toys",
     "products.categories.animeFigures": "Anime Figures",
-    "products.categories.houseRental": "Free Items",
+    "products.categories.freeItems": "Free Items",
+    "products.categories.houseRental": "House Rental",
     "products.categories.pets": "Pets",
     "products.categories.officeSupplies": "Office Supplies",
     "products.categories.perfume": "Perfume",
