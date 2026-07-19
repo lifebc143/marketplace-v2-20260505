@@ -91,20 +91,22 @@ export const productsRouter = router({
     .input(
       z.object({
         title: z.string().min(1).max(255),
+        titleCn: z.string().max(255).optional(),
         description: z.string().min(1),
         price: z.number().int().positive(),
+        location: z.string().min(1).max(100),
         categoryId: z.number().int().positive(),
-        condition: z.enum(["like_new", "good", "fair", "poor"]).default("good"),
+        condition: z.enum(["brand_new", "like_new", "good", "fair"]).default("good"),
         images: z
           .array(
             z.object({
-              data: z.any(), // Accept any array-like data (Uint8Array, Buffer, etc.)
+              data: z.any(),
               mimeType: z.string(),
               isAiGenerated: z.boolean().default(false),
             })
           )
           .min(1)
-          .max(10),
+          .max(5),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -114,8 +116,10 @@ export const productsRouter = router({
           userId: ctx.user.id,
           categoryId: input.categoryId,
           title: input.title,
+          titleCn: input.titleCn,
           description: input.description,
           price: input.price,
+          location: input.location,
           condition: input.condition,
           status: "pending_review",
           isAiGenerated: input.images.some((img) => img.isAiGenerated) ? 1 : 0,
