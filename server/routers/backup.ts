@@ -1,6 +1,6 @@
 import { router, adminProcedure } from "../_core/trpc";
 import { z } from "zod";
-import { performMonthlyBackup } from "../backup-scheduler";
+import { performBackup, getNextBackupTime, getBackupHistory } from "../backup-scheduler";
 
 export const backupRouter = router({
   /**
@@ -8,10 +8,12 @@ export const backupRouter = router({
    */
   triggerBackup: adminProcedure.mutation(async () => {
     try {
-      await performMonthlyBackup();
+      const result = await performBackup(true);
       return {
-        success: true,
-        message: "備份已觸發，請檢查郵件以獲取下載連結",
+        success: result.success,
+        message: result.message || "備份已觸發，請檢查郵件以獲取下載連結",
+        downloadUrl: result.downloadUrl,
+        backupFile: result.backupFile,
       };
     } catch (error) {
       return {
@@ -25,34 +27,25 @@ export const backupRouter = router({
    * 獲取備份狀態（僅限管理員）
    */
   getBackupStatus: adminProcedure.query(async () => {
+    const history = getBackupHistory();
+    const lastBackup = history.length > 0 ? history[0] : null;
+
     return {
-      lastBackupDate: null, // 可以從數據庫查詢
-      nextBackupDate: getNextMonthLastDay(),
+      lastBackupDate: lastBackup ? new Date(lastBackup.createdAt).getTime() : null,
+      lastBackupFile: lastBackup?.filename || null,
+      lastBackupSize: lastBackup?.size || null,
+      nextBackupDate: getNextBackupTime().getTime(),
       backupFrequency: "monthly",
       recipientEmail: "lifeabcalgary@gmail.com",
+      maxBackupVersions: 3,
+      backupHistory: history.slice(0, 10),
     };
   }),
+
+  /**
+   * 獲取備份歷史（僅限管理員）
+   */
+  getBackupHistory: adminProcedure.query(async () => {
+    return getBackupHistory();
+  }),
 });
-
-/**
- * 計算下一個月份的最後一天
- */
-function getNextMonthLastDay(): Date {
-  const today = new Date();
-  const currentMonth = today.getMonth();
-  const currentYear = today.getFullYear();
-
-  // 如果今天已經是月份的最後一天，返回下個月的最後一天
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-
-  if (today.getMonth() !== tomorrow.getMonth()) {
-    // 今天是月份的最後一天，計算下個月的最後一天
-    const nextMonth = new Date(currentYear, currentMonth + 2, 0);
-    return nextMonth;
-  } else {
-    // 返回當前月份的最後一天
-    const lastDay = new Date(currentYear, currentMonth + 1, 0);
-    return lastDay;
-  }
-}

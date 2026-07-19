@@ -8,12 +8,75 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { toast } from "sonner";
 
+/**
+ * 安全的日期格式化函數
+ * 防止 Invalid Date 或 null/undefined 導致崩潰
+ */
+function formatDate(value: unknown): string {
+  if (!value) return "—";
+  try {
+    // 支持 number (timestamp) 或 string (ISO date)
+    const date = typeof value === "number" ? new Date(value) : new Date(String(value));
+    
+    // 檢查是否是有效的日期
+    if (isNaN(date.getTime())) {
+      console.warn("[AdminBackup] Invalid date value:", value);
+      return "—";
+    }
+    
+    return date.toLocaleString("zh-TW", {
+      timeZone: "Asia/Taipei",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch (error) {
+    console.error("[AdminBackup] 日期格式化失敗:", error, value);
+    return "—";
+  }
+}
+
 export default function AdminBackup() {
+  // 所有 Hooks 必須在條件語句之前調用
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  
+  // 查詢備份狀態
+  const backupStatus = trpc.backup.getBackupStatus.useQuery(undefined, {
+    enabled: user?.role === "admin",
+  });
+  
+  // 觸發備份的 Mutation
+  const triggerBackup = trpc.backup.triggerBackup.useMutation({
+    onSuccess: (data) => {
+      try {
+        if (data?.success) {
+          toast.success(data.message || "備份已觸發，請檢查郵件以獲取下載連結");
+        } else {
+          toast.error(data?.message || "備份失敗");
+        }
+        // 重新查詢備份狀態
+        backupStatus.refetch().catch((error) => {
+          console.error("[AdminBackup] 重新查詢備份狀態失敗:", error);
+        });
+      } catch (error) {
+        console.error("[AdminBackup] onSuccess 處理失敗:", error);
+        toast.error("備份完成但更新狀態時出錯");
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    onError: (error) => {
+      console.error("[AdminBackup] 備份觸發失敗:", error);
+      toast.error(error?.message || "備份失敗");
+      setIsLoading(false);
+    },
+  });
 
   // 檢查是否是管理員
-  if (user?.role !== "admin") {
+  if (!user || user.role !== "admin") {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center min-h-screen">
@@ -35,36 +98,25 @@ export default function AdminBackup() {
     );
   }
 
-  const backupStatus = trpc.backup.getBackupStatus.useQuery();
-  const triggerBackup = trpc.backup.triggerBackup.useMutation({
-    onSuccess: (data) => {
-      if (data.success) {
-        toast.success(data.message);
-      } else {
-        toast.error(data.message);
-      }
-      setIsLoading(false);
-    },
-    onError: (error) => {
-      toast.error(error.message);
-      setIsLoading(false);
-    },
-  });
-
   const handleTriggerBackup = async () => {
-    setIsLoading(true);
-    await triggerBackup.mutateAsync();
+    try {
+      setIsLoading(true);
+      await triggerBackup.mutateAsync();
+    } catch (error) {
+      console.error("[AdminBackup] 手動備份執行失敗:", error);
+      toast.error("備份執行失敗，請查看控制台了解詳情");
+      setIsLoading(false);
+    }
   };
 
-  const nextBackupDate = backupStatus.data?.nextBackupDate
-    ? new Date(backupStatus.data.nextBackupDate).toLocaleDateString("zh-TW", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    : "計算中...";
+  // 安全地獲取備份狀態數據
+  const nextBackupDate = backupStatus.isLoading 
+    ? "加載中..." 
+    : formatDate(backupStatus.data?.nextBackupDate);
+  
+  const lastBackupDate = backupStatus.isLoading 
+    ? "加載中..." 
+    : formatDate(backupStatus.data?.lastBackupDate);
 
   return (
     <DashboardLayout>
@@ -78,7 +130,7 @@ export default function AdminBackup() {
         </div>
 
         {/* 備份狀態卡片 */}
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {/* 備份頻率 */}
           <Card>
             <CardHeader className="pb-3">
@@ -95,6 +147,24 @@ export default function AdminBackup() {
             </CardContent>
           </Card>
 
+          {/* 上次備份時間 */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4" />
+                上次備份
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-lg font-bold text-green-600">
+                {lastBackupDate}
+              </div>
+              <p className="text-sm text-muted-foreground mt-1">
+                {backupStatus.data?.lastBackupSize || ""}
+              </p>
+            </CardContent>
+          </Card>
+
           {/* 下次備份時間 */}
           <Card>
             <CardHeader className="pb-3">
@@ -104,7 +174,9 @@ export default function AdminBackup() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{nextBackupDate}</div>
+              <div className="text-lg font-bold">
+                {nextBackupDate}
+              </div>
               <p className="text-sm text-muted-foreground mt-1">
                 自動執行備份
               </p>
@@ -135,6 +207,12 @@ export default function AdminBackup() {
                 </span>
               </div>
               <div className="flex justify-between items-center py-2 border-b">
+                <span className="text-sm font-medium">包含項目</span>
+                <span className="text-sm text-muted-foreground">
+                  .env、資料庫 schema、所有源代碼
+                </span>
+              </div>
+              <div className="flex justify-between items-center py-2 border-b">
                 <span className="text-sm font-medium">上傳目標</span>
                 <span className="text-sm text-muted-foreground">
                   S3 CDN（Manus）
@@ -146,10 +224,16 @@ export default function AdminBackup() {
                   郵件通知
                 </span>
               </div>
-              <div className="flex justify-between items-center py-2">
+              <div className="flex justify-between items-center py-2 border-b">
                 <span className="text-sm font-medium">通知郵箱</span>
                 <span className="text-sm text-muted-foreground">
-                  {backupStatus.data?.recipientEmail}
+                  {backupStatus.data?.recipientEmail || "—"}
+                </span>
+              </div>
+              <div className="flex justify-between items-center py-2">
+                <span className="text-sm font-medium">版本保留</span>
+                <span className="text-sm text-muted-foreground">
+                  最近 {backupStatus.data?.maxBackupVersions || 3} 個月
                 </span>
               </div>
             </div>
@@ -167,11 +251,11 @@ export default function AdminBackup() {
           <CardContent>
             <Button
               onClick={handleTriggerBackup}
-              disabled={isLoading}
+              disabled={isLoading || triggerBackup.isPending}
               size="lg"
               className="w-full sm:w-auto"
             >
-              {isLoading ? (
+              {isLoading || triggerBackup.isPending ? (
                 <>
                   <Spinner className="mr-2 h-4 w-4" />
                   備份進行中...
@@ -186,6 +270,52 @@ export default function AdminBackup() {
           </CardContent>
         </Card>
 
+        {/* 備份歷史 */}
+        {backupStatus.data?.backupHistory && backupStatus.data.backupHistory.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>備份歷史</CardTitle>
+              <CardDescription>
+                最近的備份記錄
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {backupStatus.data.backupHistory.map((backup, index) => {
+                  try {
+                    return (
+                      <div key={index} className="flex justify-between items-center py-2 border-b last:border-b-0">
+                        <div>
+                          <p className="text-sm font-medium">{backup.filename || "—"}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {formatDate(backup.createdAt)}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm text-muted-foreground">{backup.size || "—"}</p>
+                          {backup.s3Url && (
+                            <a
+                              href={backup.s3Url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-blue-500 hover:underline"
+                            >
+                              下載
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  } catch (error) {
+                    console.error("[AdminBackup] 渲染備份歷史項目失敗:", error, backup);
+                    return null;
+                  }
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* 備份說明 */}
         <Card>
           <CardHeader>
@@ -196,7 +326,7 @@ export default function AdminBackup() {
               <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-medium text-foreground">自動備份</p>
-                <p>系統會在每月最後一天凌晨 2:00 自動執行備份</p>
+                <p>系統會在每月最後一天凌晨 2:00（台灣時區）自動執行備份</p>
               </div>
             </div>
             <div className="flex gap-3">
@@ -217,7 +347,14 @@ export default function AdminBackup() {
               <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-medium text-foreground">版本保留</p>
-                <p>系統自動保留最近 3 個月的備份版本</p>
+                <p>系統自動保留最近 3 個月的備份版本，超過期限的舊檔案自動刪除</p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-medium text-foreground">包含內容</p>
+                <p>.env 環境設定檔、資料庫 schema、所有源代碼和配置</p>
               </div>
             </div>
           </CardContent>
@@ -226,5 +363,3 @@ export default function AdminBackup() {
     </DashboardLayout>
   );
 }
-
-
