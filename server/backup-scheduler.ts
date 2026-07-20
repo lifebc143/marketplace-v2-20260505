@@ -33,8 +33,11 @@ interface BackupMetadata {
   createdAt: string;
 }
 
+// 動態獲取項目根目錄
+const projectRootPath = process.env.PROJECT_ROOT || process.cwd();
+
 const config: BackupConfig = {
-  projectPath: '/home/ubuntu/marketplace',
+  projectPath: projectRootPath,
   excludeDirs: ['node_modules', '.git'],
   backupDir: '/tmp/backups',
   recipientEmail: 'lifeabcalgary@gmail.com',
@@ -112,17 +115,26 @@ async function createBackup(): Promise<string> {
     .map(dir => `--exclude='${dir}'`)
     .join(' ');
 
-  const command = `cd /home/ubuntu && tar ${excludeFlags} -czf ${backupPath} marketplace/`;
+  // 使用絕對路徑，避免 cd 命令依賴
+  const projectName = path.basename(config.projectPath);
+  const projectParentDir = path.dirname(config.projectPath);
+  const command = `cd "${projectParentDir}" && tar ${excludeFlags} -czf "${backupPath}" "${projectName}/"`;
 
   console.log(`[Backup] 開始備份: ${backupFileName}`);
+  console.log(`[Backup] 項目路徑: ${config.projectPath}`);
+  console.log(`[Backup] 備份命令: ${command}`);
 
   try {
-    await execAsync(command);
+    const result = await execAsync(command);
     console.log(`[Backup] 備份完成: ${backupPath}`);
+    console.log(`[Backup] 命令輸出: ${result.stdout || '(無輸出)'}`);
     return backupPath;
-  } catch (error) {
+  } catch (error: any) {
     console.error(`[Backup] 備份失敗:`, error);
-    throw new Error(`備份失敗: ${error}`);
+    console.error(`[Backup] 錯誤詳情: ${error.message}`);
+    console.error(`[Backup] 命令輸出: ${error.stdout || '(無輸出)'}`);
+    console.error(`[Backup] 錯誤輸出: ${error.stderr || '(無錯誤)'}`);
+    throw new Error(`備份失敗: ${error.message}`);
   }
 }
 
