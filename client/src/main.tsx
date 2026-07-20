@@ -12,6 +12,12 @@ import { LanguageProvider } from "./contexts/LanguageContext";
 
 const queryClient = new QueryClient();
 
+// 追蹤登入重定向次數，防止無限迴圈
+let loginRedirectCount = 0;
+const MAX_REDIRECT_ATTEMPTS = 3;
+const REDIRECT_COOLDOWN_MS = 2000; // 2 秒冷卻時間
+let lastRedirectTime = 0;
+
 const redirectToLoginIfUnauthorized = (error: unknown) => {
   if (!(error instanceof TRPCClientError)) return;
   if (typeof window === "undefined") return;
@@ -20,6 +26,24 @@ const redirectToLoginIfUnauthorized = (error: unknown) => {
 
   if (!isUnauthorized) return;
 
+  // 防止無限重定向迴圈
+  const now = Date.now();
+  if (now - lastRedirectTime < REDIRECT_COOLDOWN_MS) {
+    console.warn("[Auth] Redirect cooldown active, skipping redirect");
+    return;
+  }
+
+  loginRedirectCount++;
+  lastRedirectTime = now;
+
+  if (loginRedirectCount > MAX_REDIRECT_ATTEMPTS) {
+    console.error("[Auth] Too many redirect attempts, stopping");
+    // 顯示友好的錯誤提示而不是無限迴圈
+    alert("Authentication failed. Please refresh the page and try again.");
+    return;
+  }
+
+  console.log(`[Auth] Redirecting to login (attempt ${loginRedirectCount}/${MAX_REDIRECT_ATTEMPTS})`);
   window.location.href = getLoginUrl();
 };
 

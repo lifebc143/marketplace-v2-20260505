@@ -14,7 +14,22 @@ export function useAuth(options?: UseAuthOptions) {
   const utils = trpc.useUtils();
 
   const meQuery = trpc.auth.me.useQuery(undefined, {
-    retry: false,
+    retry: (failureCount, error) => {
+      // 最多重試 3 次
+      if (failureCount >= 3) return false;
+      // 只重試特定的錯誤（臨時性錯誤）
+      if (error instanceof TRPCClientError) {
+        // 不重試授權錯誤
+        if (error.data?.code === "UNAUTHORIZED") return false;
+        // 重試其他錯誤（網路錯誤、超時等）
+        return true;
+      }
+      return true;
+    },
+    retryDelay: (attemptIndex) => {
+      // 指數退避：1s, 2s, 4s
+      return Math.min(1000 * Math.pow(2, attemptIndex), 8000);
+    },
     refetchOnWindowFocus: false,
   });
 

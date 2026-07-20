@@ -465,3 +465,13 @@
 - [ ] 測試完整的上架流程
 - [ ] 驗證圖片壓縮功能
 - [ ] 驗證表單提交和數據庫保存
+
+
+## 待修復的問題 - Google OAuth Session 衝突
+
+- [x] 修復 Session 驗證邏輯 - 允許空 name 或使用 fallback 值
+- [x] 改進 OAuth 回調錯誤處理 - 添加重試機制和友好的錯誤頁面
+- [x] 優化 Cookie 設置 - 確保 SameSite 和 Secure 標誌正確
+- [x] 改進前端認證流程 - 添加重試邏輯而不是直接重定向
+- [x] 添加 OAuth 回調超時和重試機制
+- [ ] 測試 Google OAuth 登入流程穩定性

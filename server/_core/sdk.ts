@@ -212,19 +212,19 @@ class SDKServer {
       });
       const { openId, appId, name } = payload as Record<string, unknown>;
 
-      if (
-        !isNonEmptyString(openId) ||
-        !isNonEmptyString(appId) ||
-        !isNonEmptyString(name)
-      ) {
-        console.warn("[Auth] Session payload missing required fields");
+      // 修復：允許 name 為空字串，使用 fallback 值
+      if (!isNonEmptyString(openId) || !isNonEmptyString(appId)) {
+        console.warn("[Auth] Session payload missing required fields (openId or appId)");
         return null;
       }
+
+      // name 可以為空，使用 fallback 值
+      const displayName = isNonEmptyString(name) ? name : "User";
 
       return {
         openId,
         appId,
-        name,
+        name: displayName,
       };
     } catch (error) {
       console.warn("[Auth] Session verification failed", String(error));
